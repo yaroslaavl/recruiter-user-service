@@ -2,14 +2,21 @@ package org.yaroslaavl.userservice.database.entity;
 
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
+import org.yaroslaavl.userservice.database.entity.enums.UserType;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@SuperBuilder
 @Table(name = "user", schema = "user_data")
 @Inheritance(strategy = InheritanceType.JOINED)
 public class User {
@@ -29,6 +36,10 @@ public class User {
 
     @Column(name = "is_verified", nullable = false)
     private boolean isVerified;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "user_type", nullable = false)
+    private UserType userType;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)

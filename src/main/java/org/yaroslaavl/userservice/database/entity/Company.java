@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.yaroslaavl.userservice.database.entity.enums.CompanyStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -39,6 +40,10 @@ public class Company {
 
     @Column(name = "description")
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "company_status", nullable = false)
+    private CompanyStatus companyStatus;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)

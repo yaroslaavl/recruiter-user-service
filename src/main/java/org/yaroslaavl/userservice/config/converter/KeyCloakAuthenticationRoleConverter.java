@@ -1,4 +1,4 @@
-package org.yaroslaavl.userservice.config;
+package org.yaroslaavl.userservice.config.converter;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS user_data.company (
                          locality       VARCHAR(100),
                          employee_count INTEGER,
                          description    TEXT,
-                         created_at     TIMESTAMP       NOT NULL DEFAULT NOW()
-);
+                         company_status varchar(20)        NOT NULL,
+                         created_at     TIMESTAMP          NOT NULL DEFAULT NOW()
+)

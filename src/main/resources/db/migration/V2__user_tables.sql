@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS user_data.user (
                                               email          VARCHAR(255)       NOT NULL UNIQUE,
                                               firstname      VARCHAR(100)       NOT NULL,
                                               lastname       VARCHAR(100)       NOT NULL,
+                                              user_type      VARCHAR(25)        NOT NULL,
                                               is_verified    BOOLEAN            NOT NULL DEFAULT FALSE,
                                               created_at     TIMESTAMP       NOT NULL DEFAULT NOW()
 );
@@ -16,6 +17,6 @@ CREATE TABLE IF NOT EXISTS user_data.candidate (
 
 CREATE TABLE IF NOT EXISTS user_data.recruiter (
                                                    id             UUID PRIMARY KEY REFERENCES user_data.user(id) ON DELETE CASCADE,
-                                                   company_id     VARCHAR(20) NOT NULL REFERENCES user_data.company(nip),
+                                                   company_id     UUID NOT NULL REFERENCES user_data.company(id),
                                                    position       VARCHAR(100)
 );

@@ -3,6 +3,7 @@ package org.yaroslaavl.userservice.dto.read;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
+import lombok.Value;
 
 import java.time.LocalDateTime;
 
@@ -19,15 +20,15 @@ import java.time.LocalDateTime;
 })
 public class UserReadDto {
 
-    private String email;
+     private String email;
 
-    private String firstName;
+     private String firstName;
 
-    private String lastName;
+     private String lastName;
 
-    private String userType;
+     private String userType;
 
-    private Boolean isVerified;
+     private String accountStatus;
 
-    private LocalDateTime createdAt;
+     private LocalDateTime createdAt;
 }

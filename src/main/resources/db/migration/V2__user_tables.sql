@@ -5,7 +5,8 @@ CREATE TABLE IF NOT EXISTS user_data.user (
                                               firstname      VARCHAR(100)       NOT NULL,
                                               lastname       VARCHAR(100)       NOT NULL,
                                               user_type      VARCHAR(25)        NOT NULL,
-                                              is_verified    BOOLEAN            NOT NULL DEFAULT FALSE,
+                                              account_status VARCHAR(25)        NOT NULL,
+                                              keycloak_id    VARCHAR(100)       NOT NULL UNIQUE,
                                               created_at     TIMESTAMP       NOT NULL DEFAULT NOW()
 );
 

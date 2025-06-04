@@ -35,10 +35,12 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/api/v1/user/test-1",
 
+                                "/api/v1/auth/login",
+                                "/api/v1/auth/register-candidate",
                                 "/api/v1/mail/request-verification",
                                 "/api/v1/mail/verify-code").permitAll()
                         .requestMatchers(
-                                "/api/v1/user/test-2").hasRole("ADMIN")
+                                "/api/v1/user/test-2").hasRole("VERIFIED_CANDIDATE")
         );
 
         return http.build();

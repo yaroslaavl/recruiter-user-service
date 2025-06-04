@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
+import org.yaroslaavl.userservice.database.entity.enums.AccountStatus;
 import org.yaroslaavl.userservice.database.entity.enums.UserType;
 
 import java.time.LocalDateTime;
@@ -34,12 +35,16 @@ public class User {
     @Column(name = "lastname", nullable = false)
     private String lastName;
 
-    @Column(name = "is_verified", nullable = false)
-    private boolean isVerified;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "account_status", nullable = false)
+    private AccountStatus accountStatus;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "user_type", nullable = false)
     private UserType userType;
+
+    @Column(name = "keycloak_id", nullable = false, unique = true)
+    private String keycloakId;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false)

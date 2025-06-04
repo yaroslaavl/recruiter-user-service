@@ -12,6 +12,7 @@ import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.registration.InitialRegistrationRequestDto;
 import org.yaroslaavl.userservice.exception.EmailAlreadyRegisteredException;
+import org.yaroslaavl.userservice.exception.EmailVerificationCodeNotEqualException;
 import org.yaroslaavl.userservice.exception.EmailVerificationExpiredException;
 import org.yaroslaavl.userservice.service.EmailVerificationService;
 
@@ -68,18 +69,26 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
         Optional<User> userByEmail = userRepository.findByEmail(email);
         String redisKey = VERIFICATION + email;
 
-        if (userByEmail.isEmpty()) {
-            String hasToken = redisService.hasToken(redisKey);
+        if (userByEmail.isPresent()) {
+            log.error("Email {} is already registered in the system", email);
+            throw new EmailAlreadyRegisteredException("The email has been registered in the past");
+        }
 
-            if (hasToken != null && !hasToken.isEmpty()) {
-                redisService.setToken(redisKey, "VERIFIED_EMAIL", 10, TimeUnit.MINUTES);
-            } else {
+        try {
+            String storedCode = redisService.hasToken(redisKey);
+            if (storedCode == null || storedCode.isEmpty()) {
                 throw new EmailVerificationExpiredException("Email verification session is expired");
             }
 
-        } else {
-            log.error("{} already registered", email);
-            throw new EmailAlreadyRegisteredException("The mail has been registered in the past");
+            if (!verificationCode.equals(storedCode)) {
+                throw new EmailVerificationCodeNotEqualException("Verification code does not match the stored code");
+            }
+
+            redisService.setToken(redisKey, "VERIFIED_EMAIL", 10, TimeUnit.MINUTES);
+            log.info("Email {} successfully verified", email);
+        } catch (Exception e) {
+            log.error("Failed to verify code for email {}: {}", email, e.getMessage());
+            throw new RuntimeException("Failed to verify email due to an internal error", e);
         }
     }
 

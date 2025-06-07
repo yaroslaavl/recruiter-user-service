@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.registration.InitialRegistrationRequestDto;
+import org.yaroslaavl.userservice.dto.registration.UserRegistrationDto;
 import org.yaroslaavl.userservice.exception.EmailAlreadyRegisteredException;
 import org.yaroslaavl.userservice.exception.EmailVerificationCodeNotEqualException;
 import org.yaroslaavl.userservice.exception.EmailVerificationExpiredException;
@@ -32,8 +33,9 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     private final UserRepository userRepository;
     private final RedisServiceImpl redisService;
 
-    private static final String MAIL_SUBJECT = "REGISTRATION CONFIRMATION CODE";
     private static final String VERIFICATION = "VERIFICATION_";
+    private static final String EMAIL_STATUS_VERIFICATION = "VERIFIED_EMAIL";
+    private static final String MAIL_SUBJECT = "REGISTRATION CONFIRMATION CODE";
 
     @Override
     public void requestVerification(InitialRegistrationRequestDto initialRegistrationRequestDto) {
@@ -90,6 +92,18 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
             log.error("Failed to verify code for email {}: {}", email, e.getMessage());
             throw new RuntimeException("Failed to verify email due to an internal error", e);
         }
+    }
+
+    @Override
+    public String checkEmailVerification(UserRegistrationDto userRegistrationDto) {
+        String email = userRegistrationDto.getEmail();
+
+        String hasToken = redisService.hasToken(VERIFICATION + email);
+        if (!hasToken.equals(EMAIL_STATUS_VERIFICATION)) {
+            log.warn("Verification code is expired or not valid");
+            throw new EmailVerificationExpiredException("Verification code is expired or not valid");
+        }
+        return email;
     }
 
     private void sendMailVerificationCode(String email, String verificationCode) throws MailException {

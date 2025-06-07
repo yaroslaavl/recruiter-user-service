@@ -13,4 +13,6 @@ public class RecruiterReadDto extends UserReadDto {
     private UUID companyId;
 
     private String position;
+
+    private String companyRole;
 }

@@ -1,9 +1,6 @@
 package org.yaroslaavl.userservice.service;
 
-import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.http.ResponseEntity;
-import org.yaroslaavl.userservice.dto.AuthTokenDto;
-import org.yaroslaavl.userservice.dto.login.LoginDto;
+import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
 import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
 import org.yaroslaavl.userservice.dto.registration.CandidateRegistrationDto;
@@ -13,9 +10,5 @@ public interface AuthService {
 
     CandidateReadDto createCandidateAccount(CandidateRegistrationDto candidateRegistrationDto);
 
-    RecruiterReadDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto);
-
-    UserRepresentation getUserById(String id);
-
-    AuthTokenDto login(LoginDto loginDto);
+    RecruiterReadDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto, CompanyExecutedDto companyExecutedDto);
 }

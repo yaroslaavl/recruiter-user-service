@@ -1,27 +1,18 @@
 package org.yaroslaavl.userservice.database.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.yaroslaavl.userservice.database.entity.enums.CompanyStatus;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@SuperBuilder
+@EqualsAndHashCode(callSuper = true)
 @Table(name = "company", schema = "user_data")
-public class Company {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+public class Company extends BaseEntity {
 
     @Column(name = "nip", nullable = false, unique = true)
     private String nip;
@@ -29,11 +20,17 @@ public class Company {
     @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "voivodeship")
+    @Column(name = "voivodeship", nullable = false)
     private String voivodeship;
 
-    @Column(name = "locality")
-    private String locality;
+    @Column(name = "city", nullable = false)
+    private String city;
+
+    @Column(name = "post_code", nullable = false)
+    private String postCode;
+
+    @Column(name = "street", nullable = false)
+    private String street;
 
     @Column(name = "employee_count")
     private Integer employeeCount;
@@ -44,8 +41,4 @@ public class Company {
     @Enumerated(EnumType.STRING)
     @Column(name = "company_status", nullable = false)
     private CompanyStatus companyStatus;
-
-    @CreationTimestamp
-    @Column(name = "created_at", nullable = false)
-    private LocalDateTime createdAt;
 }

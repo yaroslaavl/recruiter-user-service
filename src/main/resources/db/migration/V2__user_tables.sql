@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS user_data.user (
                                               user_type      VARCHAR(25)        NOT NULL,
                                               account_status VARCHAR(25)        NOT NULL,
                                               keycloak_id    VARCHAR(100)       NOT NULL UNIQUE,
-                                              created_at     TIMESTAMP       NOT NULL DEFAULT NOW()
+                                              created_at     TIMESTAMP          NOT NULL DEFAULT NOW(),
+                                              updated_at     TIMESTAMP          NOT NULL DEFAULT NOW()
 );
 
 CREATE TABLE IF NOT EXISTS user_data.candidate (
@@ -19,5 +20,6 @@ CREATE TABLE IF NOT EXISTS user_data.candidate (
 CREATE TABLE IF NOT EXISTS user_data.recruiter (
                                                    id             UUID PRIMARY KEY REFERENCES user_data.user(id) ON DELETE CASCADE,
                                                    company_id     UUID NOT NULL REFERENCES user_data.company(id),
-                                                   position       VARCHAR(100)
+                                                   position       VARCHAR(100) NOT NULL,
+                                                   company_role   VARCHAR(25) NOT NULL
 );

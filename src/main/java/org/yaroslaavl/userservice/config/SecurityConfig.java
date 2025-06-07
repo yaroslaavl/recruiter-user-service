@@ -36,6 +36,7 @@ public class SecurityConfig {
                                 "/api/v1/user/test-1",
 
                                 "/api/v1/auth/login",
+                                "/api/v1/auth/refresh-token",
                                 "/api/v1/auth/register-candidate",
                                 "/api/v1/mail/request-verification",
                                 "/api/v1/mail/verify-code").permitAll()

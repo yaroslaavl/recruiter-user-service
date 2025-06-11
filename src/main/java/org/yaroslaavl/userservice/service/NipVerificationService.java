@@ -5,5 +5,5 @@ import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 @FunctionalInterface
 public interface NipVerificationService {
 
-    CompanyExecutedDto verification(String nip);
+    CompanyExecutedDto verification(String nip, String email);
 }

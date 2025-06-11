@@ -295,16 +295,5 @@
                 </executions>
             </plugin>
         </plugins>
-        <resources>
-            <resource>
-                <directory>src/main/resources</directory>
-                <filtering>false</filtering>
-            </resource>
-            <resource>
-                <directory>src/main/resources-spi</directory>
-                <targetPath>META-INF/services</targetPath>
-                <filtering>false</filtering>
-            </resource>
-        </resources>
     </build>
 </project>

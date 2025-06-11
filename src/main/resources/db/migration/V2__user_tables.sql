@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS user_data.user (
                                               lastname       VARCHAR(100)       NOT NULL,
                                               user_type      VARCHAR(25)        NOT NULL,
                                               account_status VARCHAR(25)        NOT NULL,
-                                              keycloak_id    VARCHAR(100)       NOT NULL UNIQUE,
+                                              keycloak_id    VARCHAR(100)       UNIQUE,
                                               created_at     TIMESTAMP          NOT NULL DEFAULT NOW(),
                                               updated_at     TIMESTAMP          NOT NULL DEFAULT NOW()
 );

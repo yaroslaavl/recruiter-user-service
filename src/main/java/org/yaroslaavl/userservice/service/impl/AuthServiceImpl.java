@@ -5,11 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.Candidate;
+import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
 import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.entity.enums.AccountStatus;
+import org.yaroslaavl.userservice.database.entity.enums.CompanyRole;
+import org.yaroslaavl.userservice.database.entity.enums.CompanyStatus;
 import org.yaroslaavl.userservice.database.entity.enums.UserType;
 import org.yaroslaavl.userservice.database.repository.CandidateRepository;
+import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.database.repository.RecruiterRepository;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
@@ -35,17 +39,20 @@ public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final RecruiterMapper recruiterMapper;
     private final CandidateMapper candidateMapper;
+    private final CompanyRepository companyRepository;
     private final CandidateRepository candidateRepository;
     private final RecruiterRepository recruiterRepository;
+    private final CompanyServiceImpl companyService;
     private final KeycloakRegistrationServiceImpl registrationService;
     private final EmailVerificationServiceImpl emailVerificationService;
+    private final RecruiterRegistrationRequestServiceImpl recruiterRegistrationRequestService;
 
     private static final String VERIFICATION = "VERIFICATION_";
 
     @Override
     @Transactional
     public CandidateReadDto createCandidateAccount(CandidateRegistrationDto candidateRegistrationDto) {
-        String email = emailVerificationService.checkEmailVerification(candidateRegistrationDto);
+        String email = emailVerificationService.checkEmailVerification(candidateRegistrationDto.getEmail());
 
         Optional<User> candidateByEmail = userRepository.findByEmail(email);
         if (candidateByEmail.isPresent()) {
@@ -64,46 +71,57 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             registrationService.registerUser(candidateRegistrationDto, candidate);
-        } catch (KeyCloakUserCreationException kce) {
-            throw new KeyCloakUserCreationException("Failed to create user");
+            candidateRepository.save(candidate);
+
+            redisService.deleteToken(VERIFICATION + email);
+            log.info("Candidate with email: {} registered in the system", email);
+            return candidateMapper.toDto(candidate);
+        } catch (Exception e) {
+            log.error("Error occurred during candidate registration", e);
+            if (e instanceof KeyCloakUserCreationException) {
+                throw new KeyCloakUserCreationException("Failed to create user");
+            }
+            throw new RuntimeException("Registration failed: " + e.getMessage(), e);
         }
-
-        candidateRepository.save(candidate);
-        redisService.deleteToken(VERIFICATION + email);
-
-        log.info("Candidate with email: {} registered in the system", email);
-        return candidateMapper.toDto(candidate);
     }
 
-    //Создать таблицу в бд где будет и рекрутер и компания с их статусами и чтобы админ вручную проверял данные.
     @Override
+    @Transactional
     public RecruiterReadDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto, CompanyExecutedDto companyExecutedDto) {
-        String email = emailVerificationService.checkEmailVerification(recruiterRegistrationDto);
+        String email = emailVerificationService.checkEmailVerification(recruiterRegistrationDto.getEmail());
 
         Optional<User> candidateByEmail = userRepository.findByEmail(email);
         if (candidateByEmail.isPresent()) {
             throw new UserAlreadyRegisteredException("User already registered");
         }
 
-        Recruiter recruiter = Recruiter.builder()
+        Company company = companyService.createOrGet(companyExecutedDto);
+
+        Recruiter recruiterBuilder = Recruiter.builder()
                 .email(email)
                 .firstName(recruiterRegistrationDto.getFirstName())
                 .lastName(recruiterRegistrationDto.getLastName())
                 .userType(UserType.RECRUITER)
                 .accountStatus(AccountStatus.PENDING_APPROVAL)
+                .companyRole(company.getCompanyStatus() == CompanyStatus.PENDING ? CompanyRole.ADMIN_RECRUITER : CompanyRole.RECRUITER)
                 .position(recruiterRegistrationDto.getPosition())
                 .build();
 
         try {
-            registrationService.registerUser(recruiterRegistrationDto, recruiter);
-        } catch (KeyCloakUserCreationException kce) {
-            throw new KeyCloakUserCreationException("Failed to create user");
+            recruiterBuilder.setCompany(company);
+            Recruiter savedRecruiter = recruiterRepository.saveAndFlush(recruiterBuilder);
+            registrationService.registerUser(recruiterRegistrationDto, recruiterBuilder);
+            recruiterRegistrationRequestService.create(company, savedRecruiter);
+
+            redisService.deleteToken(VERIFICATION + email);
+            log.info("Recruiter with email: {} registered in the system", email);
+            return recruiterMapper.toDto(savedRecruiter);
+        } catch (Exception e) {
+            log.error("Error occurred during recruiter registration", e);
+            if (e instanceof KeyCloakUserCreationException) {
+                throw new KeyCloakUserCreationException("Failed to create user");
+            }
+            throw new RuntimeException("Registration failed: " + e.getMessage(), e);
         }
-
-        recruiterRepository.save(recruiter);
-        redisService.deleteToken(VERIFICATION + email);
-
-        log.info("Recruiter with email: {} registered in the system", email);
-        return recruiterMapper.toDto(recruiter);
     }
 }

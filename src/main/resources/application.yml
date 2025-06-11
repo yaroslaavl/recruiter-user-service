@@ -12,3 +12,9 @@ spring:
     import: 'consul:'
   application:
     name: user-service
+cxf:
+  path: /services
+  jaxws:
+    skipFaultLogging: false
+    endpoint:
+      soap-binding-enabled: true

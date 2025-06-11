@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
+import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
+import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
 import org.yaroslaavl.userservice.dto.registration.CandidateRegistrationDto;
+import org.yaroslaavl.userservice.dto.registration.RecruiterRegistrationDto;
+import org.yaroslaavl.userservice.dto.registration.RegistrationRecruiterAndCompanyDto;
 import org.yaroslaavl.userservice.service.impl.AuthServiceImpl;
 import org.yaroslaavl.userservice.service.impl.TokenServiceImpl;
 
@@ -22,6 +26,12 @@ public class AuthController {
     public ResponseEntity<CandidateReadDto> registerCandidate(@RequestBody CandidateRegistrationDto candidateRegistrationDto) {
         CandidateReadDto candidateAccount = authKeycloakService.createCandidateAccount(candidateRegistrationDto);
         return ResponseEntity.ok(candidateAccount);
+    }
+
+    @PostMapping("/register-recruiter")
+    public ResponseEntity<RecruiterReadDto> registerRecruiter(@RequestBody RegistrationRecruiterAndCompanyDto registrationRecruiterAndCompanyDto) {
+        RecruiterReadDto recruiterAccount = authKeycloakService.createRecruiterAccount(registrationRecruiterAndCompanyDto.getRecruiter(), registrationRecruiterAndCompanyDto.getCompany());
+        return ResponseEntity.ok(recruiterAccount);
     }
 
     @PostMapping("/login")

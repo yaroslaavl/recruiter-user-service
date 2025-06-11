@@ -86,7 +86,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
                 throw new EmailVerificationCodeNotEqualException("Verification code does not match the stored code");
             }
 
-            redisService.setToken(redisKey, "VERIFIED_EMAIL", 10, TimeUnit.MINUTES);
+            redisService.setToken(redisKey, EMAIL_STATUS_VERIFICATION, 100, TimeUnit.MINUTES);
             log.info("Email {} successfully verified", email);
         } catch (Exception e) {
             log.error("Failed to verify code for email {}: {}", email, e.getMessage());
@@ -95,11 +95,10 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
     }
 
     @Override
-    public String checkEmailVerification(UserRegistrationDto userRegistrationDto) {
-        String email = userRegistrationDto.getEmail();
-
+    public String checkEmailVerification(String email) {
         String hasToken = redisService.hasToken(VERIFICATION + email);
-        if (!hasToken.equals(EMAIL_STATUS_VERIFICATION)) {
+
+        if (hasToken == null || !hasToken.equals(EMAIL_STATUS_VERIFICATION)) {
             log.warn("Verification code is expired or not valid");
             throw new EmailVerificationExpiredException("Verification code is expired or not valid");
         }

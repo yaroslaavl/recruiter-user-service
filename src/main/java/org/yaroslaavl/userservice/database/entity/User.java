@@ -37,6 +37,6 @@ public class User extends BaseEntity {
     @Column(name = "user_type", nullable = false)
     private UserType userType;
 
-    @Column(name = "keycloak_id", nullable = false, unique = true)
+    @Column(name = "keycloak_id", unique = true)
     private String keycloakId;
 }

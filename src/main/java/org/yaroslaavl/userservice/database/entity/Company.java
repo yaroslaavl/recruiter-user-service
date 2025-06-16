@@ -3,7 +3,9 @@ package org.yaroslaavl.userservice.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.yaroslaavl.userservice.database.entity.enums.CompanyStatus;
+import org.yaroslaavl.userservice.database.entity.enums.company.CompanyStatus;
+
+import java.util.List;
 
 @Data
 @Entity
@@ -37,6 +39,15 @@ public class Company extends BaseEntity {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "logo_url")
+    private String logoUrl;
+
+    @Column(name = "banner_url")
+    private String bannerUrl;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "company")
+    private List<Recruiter> recruiterList;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "company_status", nullable = false)

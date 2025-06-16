@@ -7,8 +7,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.yaroslaavl.userservice.database.entity.enums.AccountStatus;
-import org.yaroslaavl.userservice.database.entity.enums.UserType;
+import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
+import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 
 @Data
 @Entity

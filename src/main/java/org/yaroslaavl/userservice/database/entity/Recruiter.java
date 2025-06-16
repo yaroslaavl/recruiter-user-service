@@ -3,7 +3,7 @@ package org.yaroslaavl.userservice.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.yaroslaavl.userservice.database.entity.enums.CompanyRole;
+import org.yaroslaavl.userservice.database.entity.enums.company.CompanyRole;
 
 @Data
 @Entity

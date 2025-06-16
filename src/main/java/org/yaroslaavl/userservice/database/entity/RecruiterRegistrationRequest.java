@@ -2,7 +2,7 @@ package org.yaroslaavl.userservice.database.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.yaroslaavl.userservice.database.entity.enums.RequestStatus;
+import org.yaroslaavl.userservice.database.entity.enums.registrationRequest.RequestStatus;
 
 import java.time.LocalDateTime;
 

@@ -1,4 +1,4 @@
-package org.yaroslaavl.userservice.database.entity.enums;
+package org.yaroslaavl.userservice.database.entity.enums.user;
 
 import lombok.Getter;
 

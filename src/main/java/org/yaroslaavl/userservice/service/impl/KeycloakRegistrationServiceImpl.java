@@ -11,7 +11,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.yaroslaavl.userservice.database.entity.User;
-import org.yaroslaavl.userservice.database.entity.enums.UserType;
+import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.registration.UserRegistrationDto;
 import org.yaroslaavl.userservice.exception.KeyCloakUserCreationException;

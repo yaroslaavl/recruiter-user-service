@@ -8,10 +8,9 @@ import org.yaroslaavl.userservice.database.entity.Candidate;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
 import org.yaroslaavl.userservice.database.entity.User;
-import org.yaroslaavl.userservice.database.entity.enums.AccountStatus;
-import org.yaroslaavl.userservice.database.entity.enums.CompanyRole;
-import org.yaroslaavl.userservice.database.entity.enums.CompanyStatus;
-import org.yaroslaavl.userservice.database.entity.enums.UserType;
+import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
+import org.yaroslaavl.userservice.database.entity.enums.company.CompanyRole;
+import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 import org.yaroslaavl.userservice.database.repository.CandidateRepository;
 import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.database.repository.RecruiterRepository;
@@ -28,6 +27,7 @@ import org.yaroslaavl.userservice.mapper.RecruiterMapper;
 import org.yaroslaavl.userservice.service.AuthService;
 
 import java.util.Optional;
+import java.util.Random;
 
 @Slf4j
 @Service
@@ -58,7 +58,8 @@ public class AuthServiceImpl implements AuthService {
         if (candidateByEmail.isPresent()) {
             throw new UserAlreadyRegisteredException("User already registered");
         }
-
+        Random random = new Random();
+        random.ints();
         Candidate candidate = Candidate.builder()
                 .email(email)
                 .firstName(candidateRegistrationDto.getFirstName())
@@ -103,7 +104,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(recruiterRegistrationDto.getLastName())
                 .userType(UserType.RECRUITER)
                 .accountStatus(AccountStatus.PENDING_APPROVAL)
-                .companyRole(company.getCompanyStatus() == CompanyStatus.PENDING ? CompanyRole.ADMIN_RECRUITER : CompanyRole.RECRUITER)
+                .companyRole(companyRepository.findCompanyByIdAndRecruiterListIsEmpty(company.getId()).isEmpty() ? CompanyRole.RECRUITER : CompanyRole.ADMIN_RECRUITER)
                 .position(recruiterRegistrationDto.getPosition())
                 .build();
 

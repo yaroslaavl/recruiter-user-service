@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
 import org.yaroslaavl.userservice.database.entity.RecruiterRegistrationRequest;
-import org.yaroslaavl.userservice.database.entity.enums.RequestStatus;
+import org.yaroslaavl.userservice.database.entity.enums.registrationRequest.RequestStatus;
 import org.yaroslaavl.userservice.database.repository.RecruiterRegistrationRequestRepository;
 import org.yaroslaavl.userservice.exception.RecruiterRequestCreatedException;
 import org.yaroslaavl.userservice.service.RecruiterRegistrationRequestService;

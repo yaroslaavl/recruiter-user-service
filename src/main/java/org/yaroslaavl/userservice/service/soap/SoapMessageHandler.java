@@ -4,14 +4,11 @@ import jakarta.xml.ws.handler.MessageContext;
 import jakarta.xml.ws.handler.soap.SOAPHandler;
 import jakarta.xml.ws.handler.soap.SOAPMessageContext;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-
 
 import javax.xml.namespace.QName;
 import java.util.*;
 
 @Slf4j
-@Component
 public class SoapMessageHandler implements SOAPHandler<SOAPMessageContext> {
 
     public static String sessionCookie = "";

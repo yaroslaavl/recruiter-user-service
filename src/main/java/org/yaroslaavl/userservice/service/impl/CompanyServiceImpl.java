@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.Company;
-import org.yaroslaavl.userservice.database.entity.enums.CompanyStatus;
+import org.yaroslaavl.userservice.database.entity.enums.company.CompanyStatus;
 import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.service.CompanyService;

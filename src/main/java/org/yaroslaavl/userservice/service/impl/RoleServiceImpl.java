@@ -9,7 +9,7 @@ import org.keycloak.admin.client.resource.UsersResource;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.yaroslaavl.userservice.database.entity.enums.UserType;
+import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 import org.yaroslaavl.userservice.service.RoleService;
 
 import java.util.List;

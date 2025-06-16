@@ -12,18 +12,16 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
 import org.yaroslaavl.userservice.database.entity.User;
-import org.yaroslaavl.userservice.database.entity.enums.AccountStatus;
+import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.exception.AuthLoginException;
-import org.yaroslaavl.userservice.exception.UserAlreadyRegisteredException;
 import org.yaroslaavl.userservice.exception.UserNotFoundException;
 import org.yaroslaavl.userservice.exception.UserVerificationNotAcceptedException;
 import org.yaroslaavl.userservice.service.TokenService;
 
 import java.text.MessageFormat;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -47,7 +45,7 @@ public class TokenServiceImpl implements TokenService {
 
         if (userByEmail instanceof Recruiter recruiter) {
             if (recruiter.getAccountStatus() == AccountStatus.PENDING_APPROVAL) {
-                throw new UserVerificationNotAcceptedException("Company is not yet verified");
+                throw new UserVerificationNotAcceptedException("Not yet verified");
             }
         }
 

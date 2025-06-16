@@ -2,6 +2,7 @@ package org.yaroslaavl.userservice.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import org.yaroslaavl.userservice.config.converter.KeyCloakAuthenticationRoleCon
 import java.util.Collection;
 
 @Configuration
+@EnableScheduling
 public class SecurityConfig {
 
     @Bean
@@ -33,7 +35,6 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/error",
                                 "/actuator/health",
-                                "/api/v1/user/test-1",
 
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh-token",
@@ -42,10 +43,14 @@ public class SecurityConfig {
 
                                 "/api/v1/nip/verify",
 
-                                "/api/v1/mail/request-verification",
+                                "/api/v1/mail/request-verification-candidate",
+                                "/api/v1/mail/request-verification-recruiter",
                                 "/api/v1/mail/verify-code").permitAll()
                         .requestMatchers(
                                 "/api/v1/user/test-2").hasRole("VERIFIED_CANDIDATE")
+                        .requestMatchers(
+                                "/api/v1/user/delete"
+                        ).authenticated()
         );
 
         return http.build();

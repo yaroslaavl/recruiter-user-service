@@ -1,7 +1,13 @@
 package org.yaroslaavl.userservice.controller;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
@@ -13,6 +19,11 @@ import org.yaroslaavl.userservice.dto.registration.RecruiterRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RegistrationRecruiterAndCompanyDto;
 import org.yaroslaavl.userservice.service.impl.AuthServiceImpl;
 import org.yaroslaavl.userservice.service.impl.TokenServiceImpl;
+import org.yaroslaavl.userservice.validation.groups.CandidateAction;
+import org.yaroslaavl.userservice.validation.groups.CreateAction;
+import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
+
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,15 +34,27 @@ public class AuthController {
     private final TokenServiceImpl tokenService;
 
     @PostMapping("/register-candidate")
-    public ResponseEntity<CandidateReadDto> registerCandidate(@RequestBody CandidateRegistrationDto candidateRegistrationDto) {
+    public ResponseEntity<CandidateReadDto> registerCandidate(@RequestBody @Validated({CreateAction.class, CandidateAction.class}) CandidateRegistrationDto candidateRegistrationDto) {
         CandidateReadDto candidateAccount = authKeycloakService.createCandidateAccount(candidateRegistrationDto);
         return ResponseEntity.ok(candidateAccount);
     }
 
     @PostMapping("/register-recruiter")
     public ResponseEntity<RecruiterReadDto> registerRecruiter(@RequestBody RegistrationRecruiterAndCompanyDto registrationRecruiterAndCompanyDto) {
-        RecruiterReadDto recruiterAccount = authKeycloakService.createRecruiterAccount(registrationRecruiterAndCompanyDto.getRecruiter(), registrationRecruiterAndCompanyDto.getCompany());
-        return ResponseEntity.ok(recruiterAccount);
+        ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
+        Validator validator = validatorFactory.getValidator();
+
+        Set<ConstraintViolation<RecruiterRegistrationDto>> validate =
+                validator.validate(registrationRecruiterAndCompanyDto.getRecruiter(), RecruiterAction.class, CreateAction.class);
+        if (validate.isEmpty()) {
+            RecruiterReadDto recruiterAccount = authKeycloakService.createRecruiterAccount(
+                    registrationRecruiterAndCompanyDto.getRecruiter(),
+                    registrationRecruiterAndCompanyDto.getCompany());
+
+            return ResponseEntity.ok(recruiterAccount);
+        }
+
+        return ResponseEntity.ok(null);
     }
 
     @PostMapping("/login")

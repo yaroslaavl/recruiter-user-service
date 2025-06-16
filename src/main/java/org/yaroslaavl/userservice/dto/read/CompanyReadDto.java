@@ -9,6 +9,8 @@ public record CompanyReadDto(String name,
                              String street,
                              Integer employeeCount,
                              String description,
+                             String logoUrl,
+                             String bannerUrl,
                              String companyStatus,
                              LocalDateTime createdAt) {
 }

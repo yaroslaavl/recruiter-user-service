@@ -8,6 +8,8 @@ CREATE TABLE IF NOT EXISTS user_data.company (
                          street         VARCHAR(100)       NOT NULL,
                          employee_count INTEGER,
                          description    TEXT,
+                         logo_url TEXT,
+                         banner_url TEXT,
                          company_status varchar(20)        NOT NULL,
                          created_at     TIMESTAMP          NOT NULL DEFAULT NOW(),
                          updated_at     TIMESTAMP          NOT NULL DEFAULT NOW()

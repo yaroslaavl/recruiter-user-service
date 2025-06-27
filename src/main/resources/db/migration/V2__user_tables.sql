@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS user_data.user (
 
 CREATE TABLE IF NOT EXISTS user_data.candidate (
                                                    id             UUID PRIMARY KEY REFERENCES user_data.user(id) ON DELETE CASCADE,
-                                                   phone_number   VARCHAR(50) NOT NULL,
-                                                   linkedin_link  VARCHAR(255)
+                                                   phone_number   VARCHAR(50) NOT NULL UNIQUE,
+                                                   linkedin_link  VARCHAR(255) UNIQUE
 );
 
 CREATE TABLE IF NOT EXISTS user_data.recruiter (

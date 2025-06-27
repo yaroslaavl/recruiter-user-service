@@ -18,9 +18,9 @@ import lombok.experimental.SuperBuilder;
 @Table(name = "candidate", schema = "user_data")
 public class Candidate extends User {
 
-    @Column(name = "phone_number", nullable = false)
+    @Column(name = "phone_number", nullable = false, unique = true)
     private String phoneNumber;
 
-    @Column(name = "linkedin_link")
+    @Column(name = "linkedin_link", unique = true)
     private String linkedinLink;
 }

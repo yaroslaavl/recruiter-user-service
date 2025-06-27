@@ -10,8 +10,8 @@ import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.service.impl.NipVerificationServiceImpl;
 
 @RestController
-@RequestMapping("/api/v1/nip")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/nip/")
 public class NipVerificationController {
 
     private final NipVerificationServiceImpl nipVerificationService;

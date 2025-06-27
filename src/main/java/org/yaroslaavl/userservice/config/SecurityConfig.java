@@ -47,10 +47,18 @@ public class SecurityConfig {
                                 "/api/v1/mail/request-verification-recruiter",
                                 "/api/v1/mail/verify-code").permitAll()
                         .requestMatchers(
-                                "/api/v1/user/test-2").hasRole("VERIFIED_CANDIDATE")
-                        .requestMatchers(
-                                "/api/v1/user/delete"
+                                "/api/v1/user/profile-data",
+                                "/api/v1/user/user-account",
+                                "/api/v1/user/change-password",
+                                "/api/v1/user/candidate-info",
+                                "/api/v1/user/recruiter-info"
                         ).authenticated()
+                        .requestMatchers(
+                                "/api/v1/user/candidate-info"
+                        ).hasRole("VERIFIED_CANDIDATE")
+                        .requestMatchers(
+                                "/api/v1/user/recruiter-info"
+                        ).hasRole("VERIFIED_RECRUITER")
         );
 
         return http.build();

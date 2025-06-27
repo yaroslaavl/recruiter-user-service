@@ -34,13 +34,17 @@ public class AuthController {
     private final TokenServiceImpl tokenService;
 
     @PostMapping("/register-candidate")
-    public ResponseEntity<CandidateReadDto> registerCandidate(@RequestBody @Validated({CreateAction.class, CandidateAction.class}) CandidateRegistrationDto candidateRegistrationDto) {
+    public ResponseEntity<CandidateReadDto> registerCandidate(
+            @RequestBody @Validated({CreateAction.class, CandidateAction.class}) CandidateRegistrationDto candidateRegistrationDto) {
+
         CandidateReadDto candidateAccount = authKeycloakService.createCandidateAccount(candidateRegistrationDto);
         return ResponseEntity.ok(candidateAccount);
     }
 
     @PostMapping("/register-recruiter")
-    public ResponseEntity<RecruiterReadDto> registerRecruiter(@RequestBody RegistrationRecruiterAndCompanyDto registrationRecruiterAndCompanyDto) {
+    public ResponseEntity<RecruiterReadDto> registerRecruiter(
+            @RequestBody RegistrationRecruiterAndCompanyDto registrationRecruiterAndCompanyDto) {
+
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
         Validator validator = validatorFactory.getValidator();
 

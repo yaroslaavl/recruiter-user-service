@@ -1,14 +1,21 @@
 package org.yaroslaavl.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.yaroslaavl.userservice.dto.user.DeleteAccountRequest;
+import org.springframework.web.bind.annotation.*;
+import org.yaroslaavl.userservice.database.entity.Candidate;
+import org.yaroslaavl.userservice.dto.read.CandidateProfileDataReadDto;
+import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
+import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
+import org.yaroslaavl.userservice.dto.request.*;
+import org.yaroslaavl.userservice.service.impl.CandidateServiceImpl;
+import org.yaroslaavl.userservice.service.impl.RecruiterServiceImpl;
 import org.yaroslaavl.userservice.service.impl.UserServiceImpl;
+import org.yaroslaavl.userservice.validation.groups.CandidateAction;
 import org.yaroslaavl.userservice.validation.groups.EditAction;
+import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,10 +23,40 @@ import org.yaroslaavl.userservice.validation.groups.EditAction;
 public class UserController {
 
     private final UserServiceImpl userService;
+    private final CandidateServiceImpl candidateService;
+    private final RecruiterServiceImpl recruiterService;
 
-    @DeleteMapping("/delete")
+    @DeleteMapping("/user-account")
     public void deleteUserAccount(@RequestBody @Validated(EditAction.class) DeleteAccountRequest deleteAccountRequest) {
         userService.deleteAccount(deleteAccountRequest);
     }
 
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changeUserPassword(
+            @RequestBody @Validated(EditAction.class) ChangePasswordRequest updatePasswordDto) {
+        boolean success = userService.updatePassword(updatePasswordDto);
+        if (success) {
+            return ResponseEntity.ok("Password updated successfully");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password update failed");
+        }
+    }
+
+    @PatchMapping("/profile-data")
+    public ResponseEntity<CandidateProfileDataReadDto> updateProfileData(@RequestBody CandidateProfileDataRequest candidateProfileDataRequest) {
+        CandidateProfileDataReadDto candidateProfileDataReadDto = candidateService.updateCandidateProfileData(candidateProfileDataRequest);
+        return ResponseEntity.ok(candidateProfileDataReadDto);
+    }
+
+    @PatchMapping("/candidate-info")
+    public ResponseEntity<CandidateReadDto> updateCandidateInfo(@RequestBody @Validated({EditAction.class, CandidateAction.class}) CandidateInfoRequest candidateInfoRequest) {
+        CandidateReadDto candidateReadDto = candidateService.updateUserInfo(candidateInfoRequest);
+        return ResponseEntity.ok(candidateReadDto);
+    }
+
+    @PatchMapping("/recruiter-info")
+    public ResponseEntity<RecruiterReadDto> updateRecruiterInfo(@RequestBody @Validated({EditAction.class, RecruiterAction.class}) RecruiterPositionRequest recruiterPositionRequest) {
+        RecruiterReadDto recruiterReadDto = recruiterService.updateUserInfo(recruiterPositionRequest);
+        return ResponseEntity.ok(recruiterReadDto);
+    }
 }

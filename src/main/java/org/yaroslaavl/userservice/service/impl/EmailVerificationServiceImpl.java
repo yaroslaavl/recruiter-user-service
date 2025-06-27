@@ -8,10 +8,10 @@ import org.springframework.mail.MailSendException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.registration.InitialRegistrationRequestDto;
-import org.yaroslaavl.userservice.dto.registration.UserRegistrationDto;
 import org.yaroslaavl.userservice.exception.EmailAlreadyRegisteredException;
 import org.yaroslaavl.userservice.exception.EmailVerificationCodeNotEqualException;
 import org.yaroslaavl.userservice.exception.EmailVerificationExpiredException;
@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     @Value("${mail.send_from}")

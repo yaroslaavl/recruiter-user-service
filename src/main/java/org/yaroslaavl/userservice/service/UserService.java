@@ -1,7 +1,6 @@
 package org.yaroslaavl.userservice.service;
 
-import org.yaroslaavl.userservice.dto.user.ChangePasswordRequest;
-import org.yaroslaavl.userservice.dto.user.DeleteAccountRequest;
+import org.yaroslaavl.userservice.dto.request.*;
 
 public interface UserService {
 

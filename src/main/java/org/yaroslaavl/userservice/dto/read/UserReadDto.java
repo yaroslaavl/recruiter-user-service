@@ -26,8 +26,6 @@ public class UserReadDto {
 
      private String lastName;
 
-     private String userType;
-
      private String accountStatus;
 
      private LocalDateTime createdAt;

@@ -1,4 +1,4 @@
-package org.yaroslaavl.userservice.dto.user;
+package org.yaroslaavl.userservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

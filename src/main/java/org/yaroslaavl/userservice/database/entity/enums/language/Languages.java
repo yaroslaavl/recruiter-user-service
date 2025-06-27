@@ -1,6 +1,6 @@
 package org.yaroslaavl.userservice.database.entity.enums.language;
 
-public enum Language {
+public enum Languages {
 
     ENGLISH,
 

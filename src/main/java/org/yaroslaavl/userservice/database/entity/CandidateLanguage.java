@@ -3,12 +3,12 @@ package org.yaroslaavl.userservice.database.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
-import org.yaroslaavl.userservice.database.entity.enums.language.Language;
 import org.yaroslaavl.userservice.database.entity.enums.language.LanguageLevel;
+import org.yaroslaavl.userservice.database.entity.enums.language.Languages;
 
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -19,11 +19,11 @@ public class CandidateLanguage extends BaseEntity {
     @JoinColumn(name = "candidate_id")
     private Candidate candidate;
 
-    @Enumerated(EnumType.STRING)
     @Column(name = "language", nullable = false)
-    private Language language;
-
     @Enumerated(EnumType.STRING)
+    private Languages language;
+
     @Column(name = "language_level", nullable = false)
+    @Enumerated(EnumType.STRING)
     private LanguageLevel languageLevel;
 }

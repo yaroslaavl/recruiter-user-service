@@ -2,13 +2,14 @@ package org.yaroslaavl.userservice.database.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.yaroslaavl.userservice.database.entity.enums.profile.AvailableFrom;
 import org.yaroslaavl.userservice.database.entity.enums.profile.Salary;
 import org.yaroslaavl.userservice.database.entity.enums.profile.WorkMode;
 
 @Data
 @Entity
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = true)
@@ -20,7 +21,7 @@ public class CandidateProfileData extends BaseEntity {
     private Candidate candidate;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "desiredSalary_pln", nullable = false)
+    @Column(name = "desiredsalary_pln", nullable = false)
     private Salary desiredSalary;
 
     @Enumerated(EnumType.STRING)

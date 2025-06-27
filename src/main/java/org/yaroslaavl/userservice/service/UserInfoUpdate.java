@@ -12,8 +12,8 @@ public abstract class UserInfoUpdate
                 O,
                 M extends BaseMapper<O, E, I>> {
 
-    protected SecurityContextService securityContextService;
-    protected UserRepository userRepository;
+    protected final SecurityContextService securityContextService;
+    protected final UserRepository userRepository;
 
     protected UserInfoUpdate(SecurityContextService securityContextService, UserRepository userRepository) {
         this.securityContextService = securityContextService;

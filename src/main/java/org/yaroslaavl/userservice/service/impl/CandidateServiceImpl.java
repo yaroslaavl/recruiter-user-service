@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CandidateServiceImpl extends UserInfoUpdate<Candidate, CandidateInfoRequest, CandidateReadDto, CandidateMapper> implements CandidateService {
 
-    private final SecurityContextService securityContextService;
-    private final UserRepository userRepository;
     private final LanguageRepository languageRepository;
     private final CandidateProfileDataRepository candidateProfileDataRepository;
     private final LanguageMapper languageMapper;
@@ -49,8 +47,6 @@ public class CandidateServiceImpl extends UserInfoUpdate<Candidate, CandidateInf
                                 CandidateProfileDataRepository candidateProfileDataRepository,
                                 LanguageMapper languageMapper, CandidateRepository candidateRepository, CandidateMapper candidateMapper) {
         super(securityContextService, userRepository);
-        this.securityContextService = securityContextService;
-        this.userRepository = userRepository;
         this.languageRepository = languageRepository;
         this.candidateProfileDataRepository = candidateProfileDataRepository;
         this.languageMapper = languageMapper;

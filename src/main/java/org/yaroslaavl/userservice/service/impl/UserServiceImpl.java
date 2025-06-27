@@ -17,6 +17,7 @@ import org.yaroslaavl.userservice.dto.request.*;
 import org.yaroslaavl.userservice.exception.KeyCloakUserDeletionException;
 import org.yaroslaavl.userservice.exception.UserNotFoundException;
 import org.yaroslaavl.userservice.service.SecurityContextService;
+import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.service.UserService;
 
 @Slf4j
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
     private final Keycloak keycloak;
 
     private final SecurityContextService securityContextService;
-    private final TokenServiceImpl tokenService;
+    private final TokenService tokenService;
     private final UserRepository userRepository;
 
     @Override

@@ -7,19 +7,27 @@ import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
 import org.yaroslaavl.userservice.dto.request.RecruiterPositionRequest;
 import org.yaroslaavl.userservice.mapper.RecruiterMapper;
+import org.yaroslaavl.userservice.service.RecruiterService;
+import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.UserInfoUpdate;
 
 @Service
-public class RecruiterServiceImpl extends UserInfoUpdate<Recruiter, RecruiterPositionRequest, RecruiterReadDto, RecruiterMapper> {
+@Transactional(readOnly = true)
+public class RecruiterServiceImpl extends UserInfoUpdate<Recruiter, RecruiterPositionRequest, RecruiterReadDto, RecruiterMapper> implements RecruiterService {
 
-    protected RecruiterServiceImpl(SecurityContextServiceImpl securityContextService, UserRepository userRepository, RecruiterMapper mapper) {
-        super(securityContextService, userRepository, mapper);
+    private final RecruiterMapper recruiterMapper;
+
+    public RecruiterServiceImpl(SecurityContextService securityContextService,
+                                UserRepository userRepository,
+                                RecruiterMapper recruiterMapper) {
+        super(securityContextService, userRepository);
+        this.recruiterMapper = recruiterMapper;
     }
 
     @Override
     @Transactional
     public RecruiterReadDto updateUserInfo(RecruiterPositionRequest inputDto) {
-        return super.updateUserInfo(inputDto);
+        return super.updateUserInfo(inputDto, recruiterMapper);
     }
 }
 

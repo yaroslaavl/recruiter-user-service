@@ -15,6 +15,7 @@ import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.dto.integrations.GusRootElement;
 import org.yaroslaavl.userservice.mapper.CompanyMapper;
+import org.yaroslaavl.userservice.service.EmailVerificationService;
 import org.yaroslaavl.userservice.service.NipVerificationService;
 import org.yaroslaavl.userservice.gus.*;
 import org.yaroslaavl.userservice.service.soap.SoapHandlerResolver;
@@ -33,7 +34,7 @@ public class NipVerificationServiceImpl implements NipVerificationService {
 
     private final CompanyMapper companyMapper;
     private final CompanyRepository companyRepository;
-    private final EmailVerificationServiceImpl emailVerificationService;
+    private final EmailVerificationService emailVerificationService;
 
     private static final String SERVICE_STATUS = "StatusUslugi";
 

@@ -48,7 +48,7 @@ public class SecurityConfig {
                                 "/api/v1/mail/verify-code").permitAll()
                         .requestMatchers(
                                 "/api/v1/user/profile-data",
-                                "/api/v1/user/user-account",
+                                "/api/v1/user/account",
                                 "/api/v1/user/change-password",
                                 "/api/v1/user/candidate-info",
                                 "/api/v1/user/recruiter-info"

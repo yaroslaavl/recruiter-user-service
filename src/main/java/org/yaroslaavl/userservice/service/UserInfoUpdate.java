@@ -12,25 +12,23 @@ public abstract class UserInfoUpdate
                 O,
                 M extends BaseMapper<O, E, I>> {
 
-    protected SecurityContextServiceImpl securityContextService;
+    protected SecurityContextService securityContextService;
     protected UserRepository userRepository;
-    protected M mapper;
 
-    protected UserInfoUpdate(SecurityContextServiceImpl securityContextService, UserRepository userRepository, M mapper) {
+    protected UserInfoUpdate(SecurityContextService securityContextService, UserRepository userRepository) {
         this.securityContextService = securityContextService;
         this.userRepository = userRepository;
-        this.mapper = mapper;
     }
 
-    public O updateUserInfo(I inputDto) {
+    public O updateUserInfo(I inputDto, M mapper) {
+        if (inputDto == null) {
+            throw new IllegalArgumentException("Request cannot be null");
+        }
+
         String userEmail = securityContextService.getSecurityContext();
 
         E user = (E) userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
-
-        if (inputDto == null) {
-            throw new IllegalArgumentException("Request cannot be null");
-        }
 
         mapper.updateEntity(inputDto, user);
 

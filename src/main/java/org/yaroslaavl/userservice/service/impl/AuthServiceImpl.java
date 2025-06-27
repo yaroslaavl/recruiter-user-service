@@ -24,7 +24,7 @@ import org.yaroslaavl.userservice.exception.KeyCloakUserCreationException;
 import org.yaroslaavl.userservice.exception.UserAlreadyRegisteredException;
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.RecruiterMapper;
-import org.yaroslaavl.userservice.service.AuthService;
+import org.yaroslaavl.userservice.service.*;
 
 import java.util.Optional;
 import java.util.Random;
@@ -35,17 +35,17 @@ import java.util.Random;
 @Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
-    private final RedisServiceImpl redisService;
+    private final RedisService redisService;
     private final UserRepository userRepository;
     private final RecruiterMapper recruiterMapper;
     private final CandidateMapper candidateMapper;
     private final CompanyRepository companyRepository;
     private final CandidateRepository candidateRepository;
     private final RecruiterRepository recruiterRepository;
-    private final CompanyServiceImpl companyService;
-    private final KeycloakRegistrationServiceImpl registrationService;
-    private final EmailVerificationServiceImpl emailVerificationService;
-    private final RecruiterRegistrationRequestServiceImpl recruiterRegistrationRequestService;
+    private final CompanyService companyService;
+    private final KeycloakRegistrationService registrationService;
+    private final EmailVerificationService emailVerificationService;
+    private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
 
     private static final String VERIFICATION = "VERIFICATION_";
 

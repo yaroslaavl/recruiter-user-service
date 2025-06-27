@@ -16,6 +16,7 @@ import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.registration.UserRegistrationDto;
 import org.yaroslaavl.userservice.exception.KeyCloakUserCreationException;
 import org.yaroslaavl.userservice.service.KeycloakRegistrationService;
+import org.yaroslaavl.userservice.service.RoleService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,7 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
     private String realm;
 
     private final Keycloak keycloak;
-    private final RoleServiceImpl roleService;
+    private final RoleService roleService;
     private final UserRepository userRepository;
 
     private static final Integer HTTP_CREATE_STATUS = 201;

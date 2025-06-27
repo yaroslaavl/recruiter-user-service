@@ -25,6 +25,7 @@ import org.yaroslaavl.userservice.exception.UserNotFoundException;
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.LanguageMapper;
 import org.yaroslaavl.userservice.service.CandidateService;
+import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.UserInfoUpdate;
 
 import java.util.*;
@@ -34,32 +35,33 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 public class CandidateServiceImpl extends UserInfoUpdate<Candidate, CandidateInfoRequest, CandidateReadDto, CandidateMapper> implements CandidateService {
 
-    private final SecurityContextServiceImpl securityContextService;
+    private final SecurityContextService securityContextService;
     private final UserRepository userRepository;
     private final LanguageRepository languageRepository;
     private final CandidateProfileDataRepository candidateProfileDataRepository;
     private final LanguageMapper languageMapper;
     private final CandidateRepository candidateRepository;
+    private final CandidateMapper candidateMapper;
 
-    public CandidateServiceImpl(SecurityContextServiceImpl securityContextService,
+    public CandidateServiceImpl(SecurityContextService securityContextService,
                                 UserRepository userRepository,
-                                CandidateMapper mapper,
                                 LanguageRepository languageRepository,
                                 CandidateProfileDataRepository candidateProfileDataRepository,
-                                LanguageMapper languageMapper, CandidateRepository candidateRepository) {
-        super(securityContextService, userRepository, mapper);
+                                LanguageMapper languageMapper, CandidateRepository candidateRepository, CandidateMapper candidateMapper) {
+        super(securityContextService, userRepository);
         this.securityContextService = securityContextService;
         this.userRepository = userRepository;
         this.languageRepository = languageRepository;
         this.candidateProfileDataRepository = candidateProfileDataRepository;
         this.languageMapper = languageMapper;
         this.candidateRepository = candidateRepository;
+        this.candidateMapper = candidateMapper;
     }
 
     @Override
     @Transactional
     public CandidateReadDto updateUserInfo(CandidateInfoRequest inputDto) {
-        return super.updateUserInfo(inputDto);
+        return super.updateUserInfo(inputDto, candidateMapper);
     }
 
     @Override

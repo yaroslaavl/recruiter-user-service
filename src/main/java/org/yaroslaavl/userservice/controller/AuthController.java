@@ -5,20 +5,18 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
-import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
 import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
 import org.yaroslaavl.userservice.dto.registration.CandidateRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RecruiterRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RegistrationRecruiterAndCompanyDto;
-import org.yaroslaavl.userservice.service.impl.AuthServiceImpl;
-import org.yaroslaavl.userservice.service.impl.TokenServiceImpl;
+import org.yaroslaavl.userservice.service.AuthService;
+import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.validation.groups.CandidateAction;
 import org.yaroslaavl.userservice.validation.groups.CreateAction;
 import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
@@ -30,8 +28,8 @@ import java.util.Set;
 @RequestMapping("/api/v1/auth/")
 public class AuthController {
 
-    private final AuthServiceImpl authKeycloakService;
-    private final TokenServiceImpl tokenService;
+    private final AuthService authKeycloakService;
+    private final TokenService tokenService;
 
     @PostMapping("/register-candidate")
     public ResponseEntity<CandidateReadDto> registerCandidate(

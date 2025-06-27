@@ -16,6 +16,7 @@ import org.yaroslaavl.userservice.exception.EmailAlreadyRegisteredException;
 import org.yaroslaavl.userservice.exception.EmailVerificationCodeNotEqualException;
 import org.yaroslaavl.userservice.exception.EmailVerificationExpiredException;
 import org.yaroslaavl.userservice.service.EmailVerificationService;
+import org.yaroslaavl.userservice.service.RedisService;
 
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -32,7 +33,7 @@ public class EmailVerificationServiceImpl implements EmailVerificationService {
 
     private final JavaMailSender javaMailSender;
     private final UserRepository userRepository;
-    private final RedisServiceImpl redisService;
+    private final RedisService redisService;
 
     private static final String VERIFICATION = "VERIFICATION_";
     private static final String EMAIL_STATUS_VERIFICATION = "VERIFIED_EMAIL";

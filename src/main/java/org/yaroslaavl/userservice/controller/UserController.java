@@ -5,14 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.yaroslaavl.userservice.database.entity.Candidate;
 import org.yaroslaavl.userservice.dto.read.CandidateProfileDataReadDto;
 import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
 import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
 import org.yaroslaavl.userservice.dto.request.*;
-import org.yaroslaavl.userservice.service.impl.CandidateServiceImpl;
-import org.yaroslaavl.userservice.service.impl.RecruiterServiceImpl;
-import org.yaroslaavl.userservice.service.impl.UserServiceImpl;
+import org.yaroslaavl.userservice.service.CandidateService;
+import org.yaroslaavl.userservice.service.RecruiterService;
+import org.yaroslaavl.userservice.service.UserService;
 import org.yaroslaavl.userservice.validation.groups.CandidateAction;
 import org.yaroslaavl.userservice.validation.groups.EditAction;
 import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
@@ -22,13 +21,14 @@ import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
 @RequestMapping("/api/v1/user/")
 public class UserController {
 
-    private final UserServiceImpl userService;
-    private final CandidateServiceImpl candidateService;
-    private final RecruiterServiceImpl recruiterService;
+    private final UserService userService;
+    private final CandidateService candidateService;
+    private final RecruiterService recruiterService;
 
-    @DeleteMapping("/user-account")
-    public void deleteUserAccount(@RequestBody @Validated(EditAction.class) DeleteAccountRequest deleteAccountRequest) {
+    @DeleteMapping("/account")
+    public ResponseEntity<Void> deleteUserAccount(@RequestBody @Validated(EditAction.class) DeleteAccountRequest deleteAccountRequest) {
         userService.deleteAccount(deleteAccountRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/change-password")

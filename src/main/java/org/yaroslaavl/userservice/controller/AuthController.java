@@ -5,6 +5,7 @@ import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -31,6 +32,7 @@ public class AuthController {
     private final AuthService authKeycloakService;
     private final TokenService tokenService;
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register-candidate")
     public ResponseEntity<CandidateReadDto> registerCandidate(
             @RequestBody @Validated({CreateAction.class, CandidateAction.class}) CandidateRegistrationDto candidateRegistrationDto) {
@@ -39,6 +41,7 @@ public class AuthController {
         return ResponseEntity.ok(candidateAccount);
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register-recruiter")
     public ResponseEntity<RecruiterReadDto> registerRecruiter(
             @RequestBody RegistrationRecruiterAndCompanyDto registrationRecruiterAndCompanyDto) {

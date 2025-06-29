@@ -26,6 +26,7 @@ public class UserController {
     private final RecruiterService recruiterService;
 
     @DeleteMapping("/account")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteUserAccount(@RequestBody @Validated(EditAction.class) DeleteAccountRequest deleteAccountRequest) {
         userService.deleteAccount(deleteAccountRequest);
         return ResponseEntity.noContent().build();

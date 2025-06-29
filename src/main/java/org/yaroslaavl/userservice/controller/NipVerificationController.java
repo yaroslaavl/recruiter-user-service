@@ -16,7 +16,6 @@ public class NipVerificationController {
 
     private final NipVerificationService nipVerificationService;
 
-
     @PostMapping("/verify")
     public ResponseEntity<CompanyExecutedDto> nipVerification(@RequestParam("nip") String nip,
                                                               @RequestParam("email") String email) {

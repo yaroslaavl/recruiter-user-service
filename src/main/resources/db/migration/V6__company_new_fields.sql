@@ -1,0 +1,1 @@
+ALTER TABLE user_data.company ADD COLUMN website VARCHAR(255);

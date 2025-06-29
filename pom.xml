@@ -176,6 +176,11 @@
             <artifactId>osgi-resource-locator</artifactId>
             <version>2.5.0-b42</version>
         </dependency>
+        <dependency>
+            <groupId>io.minio</groupId>
+            <artifactId>minio</artifactId>
+            <version>8.5.7</version>
+        </dependency>
 
         <!-- Testing -->
         <dependency>

@@ -9,8 +9,8 @@ import org.yaroslaavl.userservice.validation.groups.CandidateAction;
 import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
 
 @RestController
-@RequestMapping("/api/v1/mail/")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/mail/")
 public class EmailVerificationController {
 
     private final EmailVerificationService emailVerificationService;

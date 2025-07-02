@@ -81,6 +81,6 @@ public class NipVerificationServiceImpl implements NipVerificationService {
             }
         }
 
-        return companyMapper.toDto(companyByNip.get());
+        return companyMapper.toExecutedDto(companyByNip.get());
     }
 }

@@ -43,6 +43,8 @@ public class SecurityConfig {
 
                                 "/api/v1/nip/verify",
 
+                                "/api/v1/company/image/*",
+                                "/api/v1/company/*",
                                 "/api/v1/mail/request-verification-candidate",
                                 "/api/v1/mail/request-verification-recruiter",
                                 "/api/v1/mail/verify-code").permitAll()
@@ -55,7 +57,9 @@ public class SecurityConfig {
                                 "/api/v1/user/candidate-info"
                         ).hasRole("VERIFIED_CANDIDATE")
                         .requestMatchers(
-                                "/api/v1/user/recruiter-info"
+                                "/api/v1/user/recruiter-info",
+                                "/api/v1/company/upload-image/*",
+                                "/api/v1/company/info/*"
                         ).hasRole("VERIFIED_RECRUITER")
         );
 

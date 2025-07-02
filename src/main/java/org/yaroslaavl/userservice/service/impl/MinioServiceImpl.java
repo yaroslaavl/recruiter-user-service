@@ -1,10 +1,9 @@
 package org.yaroslaavl.userservice.service.impl;
 
-import io.minio.BucketExistsArgs;
-import io.minio.MakeBucketArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
+import io.minio.*;
+import io.minio.errors.ErrorResponseException;
 import io.minio.errors.MinioException;
+import io.minio.messages.Item;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,8 @@ import org.yaroslaavl.userservice.exception.FileStorageException;
 import org.yaroslaavl.userservice.service.MinioService;
 
 import java.text.MessageFormat;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -32,11 +33,14 @@ public class MinioServiceImpl implements MinioService {
     private String minioUrl;
 
     private final MinioClient minioClient;
-    private static final String FOLDER = "company_image_{0}/";
+    private static final String FOLDER = "company_image/{0}_";
 
     @Override
     @SneakyThrows
-    public String upload(ImageUploadDto imageUploadDto, UUID companyId) {
+    public Map<ImageType, String> upload(ImageUploadDto imageUploadDto, UUID companyId) {
+
+        HashMap<ImageType, String> logoAndBannerUrls = new HashMap<>();
+
         try {
             if ((imageUploadDto.getLogo() == null || imageUploadDto.getLogo().isEmpty())
                     && (imageUploadDto.getBanner() == null || imageUploadDto.getBanner().isEmpty())) {
@@ -48,15 +52,35 @@ public class MinioServiceImpl implements MinioService {
                 minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
             }
 
+            String policy = """
+                    {
+                      "Version": "2012-10-17",
+                      "Statement": [
+                        {
+                          "Effect": "Allow",
+                          "Principal": "*",
+                          "Action": "s3:GetObject",
+                          "Resource": "arn:aws:s3:::%s/*"
+                        }
+                      ]
+                    }
+                    """.formatted(bucket);
+
+            minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
+                    .bucket(bucket)
+                    .config(policy)
+                    .build());
             if (imageUploadDto.getLogo() != null && !imageUploadDto.getLogo().isEmpty()) {
-                return imageProcessing(ImageType.LOGO, imageUploadDto.getLogo(), companyId);
+                String logoUrl = imageProcessing(ImageType.LOGO, imageUploadDto.getLogo(), companyId);
+                logoAndBannerUrls.put(ImageType.LOGO, logoUrl);
             }
 
             if (imageUploadDto.getBanner() != null && !imageUploadDto.getBanner().isEmpty()) {
-                return imageProcessing(ImageType.BANNER, imageUploadDto.getBanner(), companyId);
+                String bannerUrl = imageProcessing(ImageType.BANNER, imageUploadDto.getBanner(), companyId);
+                logoAndBannerUrls.put(ImageType.BANNER, bannerUrl);
             }
 
-            return null;
+            return logoAndBannerUrls;
         } catch (MinioException me) {
             log.warn("Error occurred: {}", String.valueOf(me));
             log.warn("HTTP trace: {}", me.httpTrace());
@@ -65,13 +89,9 @@ public class MinioServiceImpl implements MinioService {
     }
 
     @Override
-    public String getObject(String objectName) {
-        return "";
-    }
-
-    @Override
-    public boolean removeObject(String objectName) {
-        return false;
+    public String getObject(ImageType type, UUID companyId) {
+        String formattedFolder = MessageFormat.format(FOLDER, type);
+        return objectExist(formattedFolder, companyId);
     }
 
     private String imageProcessing(ImageType imageType, MultipartFile file, UUID companyId) {
@@ -82,16 +102,59 @@ public class MinioServiceImpl implements MinioService {
         String formattedFolder = MessageFormat.format(FOLDER, imageType);
         String extension = getExtension(file);
 
+        String image = objectExist(formattedFolder, companyId);
+
+        if (image != null && !image.isEmpty()) {
+            removeObject(image);
+        }
+
         putObject(bucket, formattedFolder, companyId, file, extension);
 
-        return minioUrl + "/" + bucket + "/" + formattedFolder + companyId + extension;
+        return minioUrl + "/" + bucket + "/" + formattedFolder + companyId + "." + extension;
+    }
+
+    @SneakyThrows
+    private void removeObject(String file) {
+        try {
+            minioClient.removeObject(RemoveObjectArgs.builder()
+                    .bucket(bucket)
+                    .object(file)
+                    .build());
+        } catch (MinioException e) {
+            log.warn("Failed to remove object from storage", e);
+            throw new FileStorageException("Failed to remove", e);
+        }
+    }
+
+    @SneakyThrows
+    private String objectExist(String formattedFolder, UUID companyId) {
+        try {
+            Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(formattedFolder + companyId).build());
+            for (Result<Item> result : results) {
+                Item item = result.get();
+                if (item.objectName().startsWith(formattedFolder + companyId)) {
+                    return item.objectName();
+                }
+            }
+
+            return null;
+        } catch (ErrorResponseException e) {
+            if ("NoSuchKey".equals(e.errorResponse().code())) {
+                return null;
+            } else {
+                throw new RuntimeException("Error occurred while checking object existence", e);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     @SneakyThrows
     private void putObject(String bucket, String objectName, UUID companyId, MultipartFile file, String extension) {
         minioClient.putObject(PutObjectArgs.builder()
                 .bucket(bucket)
-                .object(objectName + companyId + extension)
+                .object(objectName + companyId + "."  + extension)
                 .stream(file.getInputStream(), file.getSize(), -1)
                 .contentType(file.getContentType())
                 .build());

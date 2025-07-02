@@ -1,17 +1,17 @@
 package org.yaroslaavl.userservice.validation;
 
-import jakarta.activation.MimetypesFileTypeMap;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaroslaavl.userservice.database.entity.enums.company.ImageType;
 
+import java.util.Objects;
 import java.util.Set;
 
 public class ImageValidator implements ConstraintValidator<Image, MultipartFile> {
 
     private ImageType type;
-    private static final Set<String> MIME_TYPES = Set.of("image/png", "image/webp", "image/jpg", "image/jpeg");
+    private static final Set<String> MIME_TYPES = Set.of("png", "webp", "jpg", "jpeg");
 
     @Override
     public void initialize(Image constraintAnnotation) {
@@ -21,13 +21,13 @@ public class ImageValidator implements ConstraintValidator<Image, MultipartFile>
     @Override
     public boolean isValid(MultipartFile image, ConstraintValidatorContext constraintValidatorContext) {
         if (image == null || image.isEmpty()) {
-            return false;
+            return true;
         }
 
-        MimetypesFileTypeMap mimetypesFileTypeMap = new MimetypesFileTypeMap();
-        String contentType = mimetypesFileTypeMap.getContentType(image.getName());
+        int indexOfDot = Objects.requireNonNull(image.getOriginalFilename()).indexOf(".");
+        String result = image.getOriginalFilename().substring(indexOfDot + 1);
 
-        if (!MIME_TYPES.contains(contentType)) {
+        if (!MIME_TYPES.contains(result)) {
             return false;
         }
 

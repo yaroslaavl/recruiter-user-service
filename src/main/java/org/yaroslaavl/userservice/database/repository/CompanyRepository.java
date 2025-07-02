@@ -1,6 +1,7 @@
 package org.yaroslaavl.userservice.database.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
@@ -9,7 +10,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface CompanyRepository extends JpaRepository<Company, UUID> {
+public interface CompanyRepository extends JpaRepository<Company, UUID>, JpaSpecificationExecutor<Company> {
 
     Optional<Company> findCompanyByNip(String nip);
 

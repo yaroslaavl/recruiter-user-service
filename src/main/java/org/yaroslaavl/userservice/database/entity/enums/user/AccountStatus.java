@@ -8,5 +8,7 @@ public enum AccountStatus {
 
     PENDING_APPROVAL,
 
+    REJECTED,
+
     APPROVED
 }

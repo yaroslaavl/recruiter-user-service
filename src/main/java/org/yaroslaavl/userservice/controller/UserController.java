@@ -35,12 +35,8 @@ public class UserController {
     @PostMapping("/change-password")
     public ResponseEntity<?> changeUserPassword(
             @RequestBody @Validated(EditAction.class) ChangePasswordRequest updatePasswordDto) {
-        boolean success = userService.updatePassword(updatePasswordDto);
-        if (success) {
-            return ResponseEntity.ok("Password updated successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password update failed");
-        }
+        userService.updatePassword(updatePasswordDto);
+        return ResponseEntity.ok("Password updated successfully");
     }
 
     @PatchMapping("/profile-data")

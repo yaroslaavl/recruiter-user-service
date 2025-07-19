@@ -1,6 +1,9 @@
 package org.yaroslaavl.userservice.dto.read;
 
-public record LanguageReadDto(String language,
-                              String languageLevel) {
+import org.yaroslaavl.userservice.database.entity.enums.language.LanguageLevel;
+import org.yaroslaavl.userservice.database.entity.enums.language.Languages;
+
+public record LanguageReadDto(Languages language,
+                              LanguageLevel languageLevel) {
 
 }

@@ -1,5 +1,7 @@
 package org.yaroslaavl.userservice.dto.read;
 
+import org.yaroslaavl.userservice.database.entity.enums.company.CompanyStatus;
+
 import java.time.LocalDateTime;
 
 public record CompanyReadDto(String name,
@@ -12,6 +14,6 @@ public record CompanyReadDto(String name,
                              String description,
                              String logoUrl,
                              String bannerUrl,
-                             String companyStatus,
+                             CompanyStatus companyStatus,
                              LocalDateTime createdAt) {
 }

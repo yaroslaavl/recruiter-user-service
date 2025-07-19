@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
 import lombok.Value;
+import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 
 import java.time.LocalDateTime;
 
@@ -26,7 +27,7 @@ public class UserReadDto {
 
      private String lastName;
 
-     private String accountStatus;
+     private AccountStatus accountStatus;
 
      private LocalDateTime createdAt;
 }

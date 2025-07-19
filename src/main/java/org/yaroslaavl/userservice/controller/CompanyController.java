@@ -32,44 +32,23 @@ public class CompanyController {
     public ResponseEntity<String> upload(@RequestParam(name = "logo", required = false) @Image(type = ImageType.LOGO) MultipartFile logo,
                                          @RequestParam(name = "banner", required = false) @Image(type = ImageType.BANNER) MultipartFile banner,
                                          @PathVariable("companyId") UUID companyId) {
-        try {
-            ImageUploadDto imageUploadDto = new ImageUploadDto(logo, banner);
-            companyService.uploadImage(imageUploadDto, companyId);
-            return ResponseEntity.ok("Image uploaded successfully");
-        } catch (Exception e) {
-            log.error("Minio error while uploading image", e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to upload image. Please try again later.");
-        }
+        ImageUploadDto imageUploadDto = new ImageUploadDto(logo, banner);
+        companyService.uploadImage(imageUploadDto, companyId);
+        return ResponseEntity.ok("Image uploaded successfully");
     }
 
     @GetMapping("/image/{companyId}")
     public ResponseEntity<String> getImage(@PathVariable("companyId") UUID companyId,
                                            @RequestParam("imageType") ImageType imageType) {
-        try {
-            String imageObject = companyService.getImageObject(imageType, companyId);
-            return ResponseEntity.ok(imageObject);
-        } catch (Exception e) {
-            log.error("Minio error while getting image", e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Failed to get image. Please try again later.");
-        }
+        String imageObject = companyService.getImageObject(imageType, companyId);
+        return ResponseEntity.ok(imageObject);
     }
 
     @PatchMapping("/info/{companyId}")
     public ResponseEntity<String> updateCompanyDetails(@PathVariable("companyId") UUID companyId,
-                                                       @RequestBody @Validated(EditAction.class)CompanyInfoRequest companyInfoRequest) {
-        try {
-            companyService.updateCompanyDetails(companyInfoRequest, companyId);
-            return ResponseEntity.ok("Company details have changed");
-        } catch (Exception e) {
-            log.error("Error during update method", e);
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to update company details");
-        }
+                                                       @RequestBody @Validated(EditAction.class) CompanyInfoRequest companyInfoRequest) {
+        companyService.updateCompanyDetails(companyInfoRequest, companyId);
+        return ResponseEntity.ok("Company details have changed");
     }
 
     @GetMapping("/search")

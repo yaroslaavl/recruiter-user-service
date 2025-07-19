@@ -3,6 +3,7 @@ package org.yaroslaavl.userservice.dto.read;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Value;
+import org.yaroslaavl.userservice.database.entity.enums.company.CompanyRole;
 
 import java.util.UUID;
 
@@ -14,5 +15,5 @@ public class RecruiterReadDto extends UserReadDto {
 
     private String position;
 
-    private String companyRole;
+    private CompanyRole companyRole;
 }

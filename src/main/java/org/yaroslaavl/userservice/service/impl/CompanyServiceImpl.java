@@ -115,7 +115,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public String getImageObject(ImageType imageType, UUID companyId) {
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyNotFoundException("Company not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Company not found"));
 
         String imageUrl = minioService.getObject(imageType, companyId);
 
@@ -164,7 +164,7 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public CompanyReadDto getCompany(UUID companyId) {
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyNotFoundException("Company not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Company not found"));
 
         return companyMapper.toDto(company);
     }
@@ -181,12 +181,12 @@ public class CompanyServiceImpl implements CompanyService {
 
     private Company checkCompanyDetails(UUID companyId) {
         Company company = companyRepository.findById(companyId)
-                .orElseThrow(() -> new CompanyNotFoundException("Company not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Company not found"));
 
         String recruiterDetails = securityContextService.getSecurityContext();
 
         Recruiter recruiter = recruiterRepository.findByEmail(recruiterDetails)
-                .orElseThrow(() -> new RecruiterNotFoundException("Recruiter not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Recruiter not found"));
 
         if (!recruiter.getCompany().getId().equals(company.getId())) {
             throw new InvalidCompanyAssociationException("Recruiter does not belong to the specified company");

@@ -61,6 +61,9 @@ public class SecurityConfig {
                                 "/api/v1/company/upload-image/*",
                                 "/api/v1/company/info/*"
                         ).hasRole("VERIFIED_RECRUITER")
+                        .requestMatchers(
+                                "/api/v1/recruiter-registration-request/*"
+                        ).hasRole("MANAGER")
         );
 
         return http.build();

@@ -21,7 +21,7 @@ import org.yaroslaavl.userservice.dto.request.CandidateInfoRequest;
 import org.yaroslaavl.userservice.dto.request.CandidateProfileDataRequest;
 import org.yaroslaavl.userservice.dto.request.LanguageRequest;
 import org.yaroslaavl.userservice.exception.LanguagePreviousDataDeletionException;
-import org.yaroslaavl.userservice.exception.UserNotFoundException;
+import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.LanguageMapper;
 import org.yaroslaavl.userservice.service.CandidateService;
@@ -66,7 +66,7 @@ public class CandidateServiceImpl extends UserInfoUpdate<Candidate, CandidateInf
         String userEmail = securityContextService.getSecurityContext();
 
         Candidate candidate = (Candidate) userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("Candidate not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Candidate not found"));
 
         List<CandidateLanguage> languageList = getLanguages(candidateProfileDataRequest, candidate);
         languageRepository.saveAllAndFlush(languageList);
@@ -127,9 +127,9 @@ public class CandidateServiceImpl extends UserInfoUpdate<Candidate, CandidateInf
     private CandidateProfileDataReadDto toDto(CandidateProfileData profileData, List<CandidateLanguage> languages) {
         return new CandidateProfileDataReadDto(
                 profileData.getCandidate().getId(),
-                profileData.getDesiredSalary().toString(),
-                profileData.getWorkMode().toString(),
-                profileData.getAvailableFrom().toString(),
+                profileData.getDesiredSalary(),
+                profileData.getWorkMode(),
+                profileData.getAvailableFrom(),
                 profileData.getAvailableHoursPerWeek(),
                 languageMapper.toEntity(languages)
         );

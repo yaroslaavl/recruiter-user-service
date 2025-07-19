@@ -2,9 +2,8 @@ package org.yaroslaavl.userservice.service;
 
 import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
-import org.yaroslaavl.userservice.exception.UserNotFoundException;
+import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.mapper.BaseMapper;
-import org.yaroslaavl.userservice.service.impl.SecurityContextServiceImpl;
 
 public abstract class UserInfoUpdate
                <E extends User,
@@ -28,7 +27,7 @@ public abstract class UserInfoUpdate
         String userEmail = securityContextService.getSecurityContext();
 
         E user = (E) userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         mapper.updateEntity(inputDto, user);
 

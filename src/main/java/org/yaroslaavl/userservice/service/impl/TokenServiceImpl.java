@@ -17,7 +17,7 @@ import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.exception.AuthLoginException;
-import org.yaroslaavl.userservice.exception.UserNotFoundException;
+import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.exception.UserVerificationNotAcceptedException;
 import org.yaroslaavl.userservice.service.TokenService;
 
@@ -28,20 +28,20 @@ import java.text.MessageFormat;
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
-    private final UserRepository userRepository;
     @Value("${keycloak.admin_client_id}")
     private String clientId;
 
     @Value("${keycloak.admin_client_secret}")
     private String clientSecret;
 
+    private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private static final String KeyCloakAuthTokenUrl = "http://localhost:9090/realms/{0}/protocol/openid-connect/token";
 
     @Override
     public AuthTokenDto login(LoginDto loginDto) {
         User userByEmail = userRepository.findByEmail(loginDto.email())
-                .orElseThrow(() -> new UserNotFoundException("User does not have an account"));
+                .orElseThrow(() -> new EntityNotFoundException("User does not have an account"));
 
         if (userByEmail instanceof Recruiter recruiter) {
             if (recruiter.getAccountStatus() == AccountStatus.PENDING_APPROVAL) {

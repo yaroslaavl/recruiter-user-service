@@ -15,7 +15,8 @@ import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.dto.request.*;
 import org.yaroslaavl.userservice.exception.KeyCloakUserDeletionException;
-import org.yaroslaavl.userservice.exception.UserNotFoundException;
+import org.yaroslaavl.userservice.exception.KeyCloakUserUpdateException;
+import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.service.UserService;
@@ -80,7 +81,7 @@ public class UserServiceImpl implements UserService {
             int status = we.getResponse().getStatus();
             String body = we.getResponse().readEntity(String.class);
             log.error("Failed to update user. Status: {}, Body: {}", status, body);
-            throw new KeyCloakUserDeletionException("Failed to update user");
+            throw new KeyCloakUserUpdateException("Failed to update user");
         }
 
         return false;
@@ -89,7 +90,7 @@ public class UserServiceImpl implements UserService {
     private UserActionDto changeUserData(String password) {
         String securityContextEmail = securityContextService.getSecurityContext();
         User user = userRepository.findByEmail(securityContextEmail)
-                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + securityContextEmail));
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + securityContextEmail));
         AuthTokenDto login = tokenService.login(new LoginDto(securityContextEmail, password));
         return new UserActionDto(login.accessToken(), user);
     }

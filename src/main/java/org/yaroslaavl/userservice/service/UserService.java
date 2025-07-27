@@ -7,4 +7,6 @@ public interface UserService {
     void deleteAccount(DeleteAccountRequest userDeleteDto);
 
     boolean updatePassword(ChangePasswordRequest resetPasswordDto);
+
+    boolean existsAccount(String email);
 }

@@ -14,12 +14,13 @@ import org.yaroslaavl.userservice.database.repository.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.dto.request.*;
-import org.yaroslaavl.userservice.exception.KeyCloakUserDeletionException;
-import org.yaroslaavl.userservice.exception.KeyCloakUserUpdateException;
+import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.service.UserService;
+
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
             int status = we.getResponse().getStatus();
             String body = we.getResponse().readEntity(String.class);
             log.error("Failed to delete user. Status: {}, Body: {}", status, body);
-            throw new KeyCloakUserDeletionException("Failed to delete user");
+            throw new KeyCloakException("Failed to delete user");
         }
     }
 
@@ -81,10 +82,15 @@ public class UserServiceImpl implements UserService {
             int status = we.getResponse().getStatus();
             String body = we.getResponse().readEntity(String.class);
             log.error("Failed to update user. Status: {}, Body: {}", status, body);
-            throw new KeyCloakUserUpdateException("Failed to update user");
+            throw new KeyCloakException("Failed to update user");
         }
 
         return false;
+    }
+
+    @Override
+    public boolean existsAccount(String email) {
+        return userRepository.existsByEmail(email);
     }
 
     private UserActionDto changeUserData(String password) {

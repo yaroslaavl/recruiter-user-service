@@ -37,7 +37,6 @@
     </dependencyManagement>
 
     <dependencies>
-        <!-- Spring Boot starters -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -66,8 +65,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
         </dependency>
-
-        <!-- Spring Cloud -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-consul-discovery</artifactId>
@@ -105,8 +102,6 @@
             <artifactId>jakarta.xml.soap-api</artifactId>
             <version>3.0.2</version>
         </dependency>
-
-        <!-- JAXB -->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
@@ -122,15 +117,11 @@
             <artifactId>jaxb-runtime</artifactId>
             <version>3.0.2</version>
         </dependency>
-
-        <!-- Keycloak -->
         <dependency>
             <groupId>org.keycloak</groupId>
             <artifactId>keycloak-admin-client</artifactId>
             <version>26.0.5</version>
         </dependency>
-
-        <!-- MapStruct -->
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
@@ -142,8 +133,6 @@
             <version>1.5.5.Final</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -155,22 +144,16 @@
             <artifactId>lombok-mapstruct-binding</artifactId>
             <version>0.2.0</version>
         </dependency>
-
-        <!-- Flyway -->
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
             <version>9.22.3</version>
         </dependency>
-
-        <!-- PostgreSQL -->
         <dependency>
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
-
-        <!-- Misc -->
         <dependency>
             <groupId>org.glassfish.hk2</groupId>
             <artifactId>osgi-resource-locator</artifactId>
@@ -181,8 +164,6 @@
             <artifactId>minio</artifactId>
             <version>8.5.7</version>
         </dependency>
-
-        <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -191,7 +172,6 @@
     </dependencies>
     <build>
         <plugins>
-            <!-- Spring Boot Maven Plugin -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
@@ -200,7 +180,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -223,7 +202,6 @@
                 </configuration>
             </plugin>
 
-            <!-- CXF Codegen Plugin -->
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -238,7 +216,8 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${project.basedir}/src/main/resources/wsdl/UslugaBIRzewnPubl-ver11-test.wsdl</wsdl>
+                                    <wsdl>${project.basedir}/src/main/resources/wsdl/UslugaBIRzewnPubl-ver11-test.wsdl
+                                    </wsdl>
                                     <extraargs>
                                         <extraarg>-p</extraarg>
                                         <extraarg>org.yaroslaavl.userservice.gus</extraarg>
@@ -255,7 +234,6 @@
                 </executions>
             </plugin>
 
-            <!-- Maven JAR Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -272,7 +250,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven Resources Plugin to handle SPI files -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>

@@ -1,8 +1,8 @@
 package org.yaroslaavl.userservice.config;
 
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,6 @@ import org.yaroslaavl.userservice.config.converter.KeyCloakAuthenticationRoleCon
 import java.util.Collection;
 
 @Configuration
-@EnableScheduling
 public class SecurityConfig {
 
     @Bean
@@ -42,6 +41,8 @@ public class SecurityConfig {
                                 "/api/v1/auth/register-recruiter",
 
                                 "/api/v1/nip/verify",
+
+                                "/api/v1/user/exists",
 
                                 "/api/v1/company/image/*",
                                 "/api/v1/company/*",

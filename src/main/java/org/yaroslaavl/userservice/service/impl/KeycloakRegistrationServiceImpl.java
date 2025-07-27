@@ -14,7 +14,7 @@ import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.registration.UserRegistrationDto;
-import org.yaroslaavl.userservice.exception.KeyCloakUserCreationException;
+import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.service.KeycloakRegistrationService;
 import org.yaroslaavl.userservice.service.RoleService;
 
@@ -57,7 +57,7 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
         log.error("Failed to create user with email {} in Keycloak. Status: {}, Error: {}",
                 userRegistrationDto.getEmail(), response.getStatus(), errorMessage);
 
-        throw new KeyCloakUserCreationException("Failed to create user with email " + userRegistrationDto.getEmail() + " in Keycloak. Status: {" + response.getStatus() + "}, Error: " + errorMessage);
+        throw new KeyCloakException("Failed to create user with email " + userRegistrationDto.getEmail() + " in Keycloak. Status: {" + response.getStatus() + "}, Error: " + errorMessage);
     }
 
     @Override

@@ -25,6 +25,11 @@ public class UserController {
     private final CandidateService candidateService;
     private final RecruiterService recruiterService;
 
+    @GetMapping("/exists")
+    public Boolean existsAccount(@RequestParam("email") String email) {
+        return userService.existsAccount(email);
+    }
+
     @DeleteMapping("/account")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> deleteUserAccount(@RequestBody @Validated(EditAction.class) DeleteAccountRequest deleteAccountRequest) {
@@ -35,8 +40,8 @@ public class UserController {
     @PostMapping("/change-password")
     public ResponseEntity<?> changeUserPassword(
             @RequestBody @Validated(EditAction.class) ChangePasswordRequest updatePasswordDto) {
-        userService.updatePassword(updatePasswordDto);
-        return ResponseEntity.ok("Password updated successfully");
+        boolean isUpdated = userService.updatePassword(updatePasswordDto);
+        return ResponseEntity.ok(isUpdated ? "Password updated successfully" : "Password update error");
     }
 
     @PatchMapping("/profile-data")

@@ -20,14 +20,14 @@ import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
 import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
 import org.yaroslaavl.userservice.dto.registration.CandidateRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RecruiterRegistrationDto;
-import org.yaroslaavl.userservice.exception.KeyCloakUserCreationException;
+import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.exception.UserAlreadyRegisteredException;
+import org.yaroslaavl.userservice.feignClient.email.EmailFeignClient;
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.RecruiterMapper;
 import org.yaroslaavl.userservice.service.*;
 
 import java.util.Optional;
-import java.util.Random;
 
 @Slf4j
 @Service
@@ -35,7 +35,6 @@ import java.util.Random;
 @Transactional(readOnly = true)
 public class AuthServiceImpl implements AuthService {
 
-    private final RedisService redisService;
     private final UserRepository userRepository;
     private final RecruiterMapper recruiterMapper;
     private final CandidateMapper candidateMapper;
@@ -44,22 +43,19 @@ public class AuthServiceImpl implements AuthService {
     private final RecruiterRepository recruiterRepository;
     private final CompanyService companyService;
     private final KeycloakRegistrationService registrationService;
-    private final EmailVerificationService emailVerificationService;
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
-
-    private static final String VERIFICATION = "VERIFICATION_";
+    private final EmailFeignClient emailFeignClient;
 
     @Override
     @Transactional
     public CandidateReadDto createCandidateAccount(CandidateRegistrationDto candidateRegistrationDto) {
-        String email = emailVerificationService.checkEmailVerification(candidateRegistrationDto.getEmail());
+        String email = emailFeignClient.checkEmailVerification(candidateRegistrationDto.getEmail());
 
         Optional<User> candidateByEmail = userRepository.findByEmail(email);
         if (candidateByEmail.isPresent()) {
             throw new UserAlreadyRegisteredException("User already registered");
         }
-        Random random = new Random();
-        random.ints();
+
         Candidate candidate = Candidate.builder()
                 .email(email)
                 .firstName(candidateRegistrationDto.getFirstName())
@@ -74,13 +70,12 @@ public class AuthServiceImpl implements AuthService {
             registrationService.registerUser(candidateRegistrationDto, candidate);
             candidateRepository.save(candidate);
 
-            redisService.deleteToken(VERIFICATION + email);
             log.info("Candidate with email: {} registered in the system", email);
             return candidateMapper.toDto(candidate);
         } catch (Exception e) {
             log.error("Error occurred during candidate registration", e);
-            if (e instanceof KeyCloakUserCreationException) {
-                throw new KeyCloakUserCreationException("Failed to create user");
+            if (e instanceof KeyCloakException) {
+                throw new KeyCloakException("Failed to create user");
             }
             throw new RuntimeException("Registration failed: " + e.getMessage(), e);
         }
@@ -89,7 +84,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RecruiterReadDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto, CompanyExecutedDto companyExecutedDto) {
-        String email = emailVerificationService.checkEmailVerification(recruiterRegistrationDto.getEmail());
+        String email = emailFeignClient.checkEmailVerification(recruiterRegistrationDto.getEmail());
 
         Optional<User> candidateByEmail = userRepository.findByEmail(email);
         if (candidateByEmail.isPresent()) {
@@ -114,13 +109,12 @@ public class AuthServiceImpl implements AuthService {
             registrationService.registerUser(recruiterRegistrationDto, recruiterBuilder);
             recruiterRegistrationRequestService.create(company, savedRecruiter);
 
-            redisService.deleteToken(VERIFICATION + email);
             log.info("Recruiter with email: {} registered in the system", email);
             return recruiterMapper.toDto(savedRecruiter);
         } catch (Exception e) {
             log.error("Error occurred during recruiter registration", e);
-            if (e instanceof KeyCloakUserCreationException) {
-                throw new KeyCloakUserCreationException("Failed to create user");
+            if (e instanceof KeyCloakException) {
+                throw new KeyCloakException("Failed to create user");
             }
             throw new RuntimeException("Registration failed: " + e.getMessage(), e);
         }

@@ -33,7 +33,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class CandidateServiceImpl extends UserInfoUpdate<Candidate, CandidateInfoRequest, CandidateReadDto, CandidateMapper> implements CandidateService {
+public class CandidateServiceImpl extends UserInfoUpdate<
+        Candidate,
+        CandidateInfoRequest,
+        CandidateReadDto,
+        CandidateMapper> implements CandidateService {
 
     private final LanguageRepository languageRepository;
     private final CandidateProfileDataRepository candidateProfileDataRepository;

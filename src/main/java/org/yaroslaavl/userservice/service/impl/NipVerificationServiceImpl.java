@@ -3,7 +3,6 @@ package org.yaroslaavl.userservice.service.impl;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.ws.BindingProvider;
 import jakarta.xml.ws.soap.AddressingFeature;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,6 @@ import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 import org.yaroslaavl.userservice.dto.integrations.GusRootElement;
 import org.yaroslaavl.userservice.mapper.CompanyMapper;
-import org.yaroslaavl.userservice.service.EmailVerificationService;
 import org.yaroslaavl.userservice.service.NipVerificationService;
 import org.yaroslaavl.userservice.gus.*;
 import org.yaroslaavl.userservice.service.soap.SoapHandlerResolver;
@@ -34,14 +32,11 @@ public class NipVerificationServiceImpl implements NipVerificationService {
 
     private final CompanyMapper companyMapper;
     private final CompanyRepository companyRepository;
-    private final EmailVerificationService emailVerificationService;
 
     private static final String SERVICE_STATUS = "StatusUslugi";
 
     @Override
     public CompanyExecutedDto verification(String nip, String email) {
-        emailVerificationService.checkEmailVerification(email);
-
         Optional<Company> companyByNip = companyRepository.findCompanyByNip(nip);
         log.info("Entered nip: {}", nip);
 

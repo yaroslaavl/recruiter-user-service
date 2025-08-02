@@ -12,11 +12,13 @@ import org.yaroslaavl.userservice.service.SecurityContextService;
 @Service
 public class SecurityContextServiceImpl implements SecurityContextService {
 
+    private static final String EMAIL_CLAIM = "email";
+
     @Override
     public String getSecurityContext() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication instanceof JwtAuthenticationToken jwt) {
-            return jwt.getToken().getClaimAsString("email");
+            return jwt.getToken().getClaimAsString(EMAIL_CLAIM);
         }
 
         throw new EntityNotFoundException("Email not found in JWT");

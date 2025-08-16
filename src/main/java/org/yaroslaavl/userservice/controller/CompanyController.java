@@ -23,7 +23,7 @@ import java.util.UUID;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/company/")
+@RequestMapping("/api/v1/company")
 public class CompanyController {
 
     private final CompanyService companyService;

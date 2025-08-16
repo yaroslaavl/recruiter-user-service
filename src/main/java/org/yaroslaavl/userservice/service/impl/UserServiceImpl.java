@@ -92,6 +92,7 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
+    @Override
     public boolean isAccountApproved(String userId) {
         User user = userRepository.findByKeycloakId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));

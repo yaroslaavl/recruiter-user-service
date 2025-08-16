@@ -48,7 +48,7 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
             user.setKeycloakId(keycloakId);
             userRepository.saveAndFlush(user);
 
-            roleService.assignRoles(keycloakId, user.getUserType().equals(UserType.CANDIDATE) ? UserType.CANDIDATE: UserType.RECRUITER);
+            roleService.assignRoles(keycloakId, user.getUserType() == UserType.CANDIDATE ? UserType.CANDIDATE : UserType.RECRUITER);
             log.info("User with email {} successfully created in Keycloak", userRegistrationDto.getEmail());
             return;
         }
@@ -60,8 +60,7 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
         throw new KeyCloakException("Failed to create user with email " + userRegistrationDto.getEmail() + " in Keycloak. Status: {" + response.getStatus() + "}, Error: " + errorMessage);
     }
 
-    @Override
-    public UserRepresentation getUserRepresentation(UserRegistrationDto userRegistrationDto) {
+    private UserRepresentation getUserRepresentation(UserRegistrationDto userRegistrationDto) {
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(Boolean.TRUE);
         userRepresentation.setEmail(userRegistrationDto.getEmail());
@@ -78,7 +77,6 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
         credentialRepresentationList.add(credentialRepresentation);
         userRepresentation.setCredentials(credentialRepresentationList);
         return userRepresentation;
-
     }
 
     private UsersResource getUserResource() {

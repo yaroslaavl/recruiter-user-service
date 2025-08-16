@@ -18,7 +18,7 @@ import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/user/")
+@RequestMapping("/api/v1/user")
 public class UserController {
 
     private final UserService userService;
@@ -28,6 +28,11 @@ public class UserController {
     @GetMapping("/exists")
     public Boolean existsAccount(@RequestParam("email") String email) {
         return userService.existsAccount(email);
+    }
+
+    @GetMapping("/isApproved")
+    public Boolean isApproved(@RequestParam("userId") String userId) {
+        return userService.isAccountApproved(userId);
     }
 
     @DeleteMapping("/account")

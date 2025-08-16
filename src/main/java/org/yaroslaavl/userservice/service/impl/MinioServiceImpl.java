@@ -32,8 +32,10 @@ public class MinioServiceImpl implements MinioService {
     @Value("${minio.url}")
     private String minioUrl;
 
+    @Value("${bucket.folder}")
+    private String folder;
+
     private final MinioClient minioClient;
-    private static final String FOLDER = "company_image/{0}_";
 
     @Override
     @SneakyThrows
@@ -90,7 +92,7 @@ public class MinioServiceImpl implements MinioService {
 
     @Override
     public String getObject(ImageType type, UUID companyId) {
-        String formattedFolder = MessageFormat.format(FOLDER, type);
+        String formattedFolder = MessageFormat.format(folder, type);
         return objectExist(formattedFolder, companyId);
     }
 
@@ -99,7 +101,7 @@ public class MinioServiceImpl implements MinioService {
             return null;
         }
 
-        String formattedFolder = MessageFormat.format(FOLDER, imageType);
+        String formattedFolder = MessageFormat.format(folder, imageType);
         String extension = getExtension(file);
 
         String image = objectExist(formattedFolder, companyId);

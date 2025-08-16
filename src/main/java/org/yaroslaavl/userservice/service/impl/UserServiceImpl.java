@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.*;
+import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 import org.yaroslaavl.userservice.database.repository.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
@@ -19,8 +20,6 @@ import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.service.UserService;
-
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -93,11 +92,19 @@ public class UserServiceImpl implements UserService {
         return userRepository.existsByEmail(email);
     }
 
+    public boolean isAccountApproved(String userId) {
+        User user = userRepository.findByKeycloakId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        return user.getAccountStatus() == AccountStatus.PROFILE_COMPLETE;
+    }
+
     private UserActionDto changeUserData(String password) {
         String securityContextEmail = securityContextService.getSecurityContext();
         User user = userRepository.findByEmail(securityContextEmail)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + securityContextEmail));
         AuthTokenDto login = tokenService.login(new LoginDto(securityContextEmail, password));
+
         return new UserActionDto(login.accessToken(), user);
     }
 }

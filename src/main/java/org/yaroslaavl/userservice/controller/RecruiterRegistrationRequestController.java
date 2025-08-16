@@ -10,7 +10,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/recruiter-registration-request/")
+@RequestMapping("/api/v1/recruiter-registration-request")
 public class RecruiterRegistrationRequestController {
 
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;

@@ -9,4 +9,6 @@ public interface UserService {
     boolean updatePassword(ChangePasswordRequest resetPasswordDto);
 
     boolean existsAccount(String email);
+
+    boolean isAccountApproved(String userId);
 }

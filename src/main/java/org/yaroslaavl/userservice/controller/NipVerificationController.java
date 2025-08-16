@@ -11,7 +11,7 @@ import org.yaroslaavl.userservice.service.NipVerificationService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/nip/")
+@RequestMapping("/api/v1/nip")
 public class NipVerificationController {
 
     private final NipVerificationService nipVerificationService;

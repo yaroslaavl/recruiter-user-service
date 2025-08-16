@@ -1,6 +1,5 @@
 package org.yaroslaavl.userservice.config;
 
-import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -55,7 +54,8 @@ public class SecurityConfig {
                         ).authenticated()
                         .requestMatchers(
                                 "/api/v1/user/profile-data",
-                                "/api/v1/user/candidate-info"
+                                "/api/v1/user/candidate-info",
+                                "/api/v1/user/isApproved"
                         ).hasRole("VERIFIED_CANDIDATE")
                         .requestMatchers(
                                 "/api/v1/user/recruiter-info",

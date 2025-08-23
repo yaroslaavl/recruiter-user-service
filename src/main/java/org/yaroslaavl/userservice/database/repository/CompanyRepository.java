@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 import org.yaroslaavl.userservice.database.entity.Company;
-import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
 
 import java.util.Optional;
 import java.util.UUID;

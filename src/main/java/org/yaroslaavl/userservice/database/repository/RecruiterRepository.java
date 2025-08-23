@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface RecruiterRepository extends JpaRepository<Recruiter, UUID> {
 
     Optional<Recruiter> findByEmail(String email);
+
+    Optional<Recruiter> findRecruiterByKeycloakId(String keycloakId);
 }

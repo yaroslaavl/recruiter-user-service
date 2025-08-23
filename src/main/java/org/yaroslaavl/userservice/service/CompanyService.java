@@ -24,4 +24,6 @@ public interface CompanyService {
     CompanyReadDto getCompany(UUID companyId);
 
     Page<CompanyReadDto> search(String keyword, Pageable pageable);
+
+    Company getCompanyById(UUID companyId);
 }

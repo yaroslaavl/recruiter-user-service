@@ -60,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/user/recruiter-info",
                                 "/api/v1/company/upload-image/*",
+                                "/api/v1/user/belongs",
                                 "/api/v1/company/info/*"
                         ).hasRole("VERIFIED_RECRUITER")
                         .requestMatchers(

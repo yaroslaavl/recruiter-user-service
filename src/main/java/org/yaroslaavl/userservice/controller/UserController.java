@@ -16,6 +16,8 @@ import org.yaroslaavl.userservice.validation.groups.CandidateAction;
 import org.yaroslaavl.userservice.validation.groups.EditAction;
 import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
 
+import java.util.UUID;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -33,6 +35,12 @@ public class UserController {
     @GetMapping("/isApproved")
     public Boolean isApproved(@RequestParam("userId") String userId) {
         return userService.isAccountApproved(userId);
+    }
+
+    @GetMapping("/belongs")
+    public Boolean belongsToCompany(@RequestParam("recruiterKeyId") String recruiterKeyId,
+                                    @RequestParam("companyId") UUID companyId) {
+        return recruiterService.isRecruiterBelongToCompany(recruiterKeyId, companyId);
     }
 
     @DeleteMapping("/account")

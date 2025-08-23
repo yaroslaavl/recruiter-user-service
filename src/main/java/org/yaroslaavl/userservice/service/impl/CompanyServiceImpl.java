@@ -179,6 +179,12 @@ public class CompanyServiceImpl implements CompanyService {
         return companies.map(companyMapper::toDto);
     }
 
+    @Override
+    public Company getCompanyById(UUID companyId) {
+        return companyRepository.findById(companyId)
+                .orElseThrow(() -> new EntityNotFoundException("Company not found"));
+    }
+
     private Company checkCompanyDetails(UUID companyId) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Company not found"));

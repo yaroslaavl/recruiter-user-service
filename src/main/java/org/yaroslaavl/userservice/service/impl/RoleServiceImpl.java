@@ -19,7 +19,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RoleServiceImpl implements RoleService {
 
-    @Value("${keycloak.realm}")
+    @Value("${keycloak.main_app.realm}")
     private String realm;
 
     private final Keycloak keycloak;

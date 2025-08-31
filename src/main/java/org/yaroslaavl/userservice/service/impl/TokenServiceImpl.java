@@ -18,6 +18,7 @@ import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.exception.AuthLoginException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
+import org.yaroslaavl.userservice.exception.UserTemporaryBlockedException;
 import org.yaroslaavl.userservice.exception.UserVerificationNotAcceptedException;
 import org.yaroslaavl.userservice.service.TokenService;
 
@@ -28,10 +29,10 @@ import java.text.MessageFormat;
 @RequiredArgsConstructor
 public class TokenServiceImpl implements TokenService {
 
-    @Value("${keycloak.admin_client_id}")
+    @Value("${keycloak.main_app.client_id}")
     private String clientId;
 
-    @Value("${keycloak.admin_client_secret}")
+    @Value("${keycloak.main_app.client_secret}")
     private String clientSecret;
 
     private final UserRepository userRepository;
@@ -42,6 +43,10 @@ public class TokenServiceImpl implements TokenService {
     public AuthTokenDto login(LoginDto loginDto) {
         User userByEmail = userRepository.findByEmail(loginDto.email())
                 .orElseThrow(() -> new EntityNotFoundException("User does not have an account"));
+
+        if (userByEmail.getIsTemporaryBlocked() == Boolean.TRUE) {
+            throw new UserTemporaryBlockedException("User is temporary blocked");
+        }
 
         if (userByEmail instanceof Recruiter recruiter) {
             if (recruiter.getAccountStatus() == AccountStatus.PENDING_APPROVAL) {

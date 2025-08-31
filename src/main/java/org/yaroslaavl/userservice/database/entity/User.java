@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 
@@ -38,4 +39,8 @@ public class User extends BaseEntity {
 
     @Column(name = "keycloak_id", unique = true)
     private String keycloakId;
+
+    @ColumnDefault("false")
+    @Column(name = "is_temporary_blocked", nullable = false)
+    private Boolean isTemporaryBlocked;
 }

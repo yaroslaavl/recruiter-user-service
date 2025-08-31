@@ -26,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationService {
 
-    @Value("${keycloak.realm}")
+    @Value("${keycloak.main_app.realm}")
     private String realm;
 
     private final Keycloak keycloak;

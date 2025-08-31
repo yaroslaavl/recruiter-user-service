@@ -27,7 +27,7 @@ import org.yaroslaavl.userservice.service.UserService;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
 
-    @Value("${keycloak.realm}")
+    @Value("${keycloak.main_app.realm}")
     private String realm;
 
     private final Keycloak keycloak;
@@ -94,10 +94,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean isAccountApproved(String userId) {
+        log.info("Checking if user with id: {} is approved", userId);
         User user = userRepository.findByKeycloakId(userId)
                 .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
 
-        return user.getAccountStatus() == AccountStatus.PROFILE_COMPLETE;
+        if (user instanceof Candidate candidate) {
+            return candidate.getAccountStatus() == AccountStatus.PROFILE_COMPLETE;
+        }
+
+        if (user instanceof Recruiter recruiter) {
+            return recruiter.getAccountStatus() == AccountStatus.APPROVED;
+        }
+
+        return false;
     }
 
     private UserActionDto changeUserData(String password) {

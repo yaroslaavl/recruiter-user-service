@@ -1,5 +1,6 @@
 package org.yaroslaavl.userservice.config;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -11,6 +12,7 @@ import org.yaroslaavl.userservice.config.converter.KeyCloakAuthenticationRoleCon
 
 import java.util.Collection;
 
+@Slf4j
 @Configuration
 public class SecurityConfig {
 
@@ -38,11 +40,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/refresh-token",
                                 "/api/v1/auth/register-candidate",
                                 "/api/v1/auth/register-recruiter",
-
                                 "/api/v1/nip/verify",
-
-                                "/api/v1/user/exists",
-
                                 "/api/v1/company/image/*",
                                 "/api/v1/company/*",
                                 "/api/v1/mail/request-verification-candidate",
@@ -54,18 +52,20 @@ public class SecurityConfig {
                         ).authenticated()
                         .requestMatchers(
                                 "/api/v1/user/profile-data",
-                                "/api/v1/user/candidate-info",
-                                "/api/v1/user/isApproved"
+                                "/api/v1/user/candidate-info"
                         ).hasRole("VERIFIED_CANDIDATE")
                         .requestMatchers(
                                 "/api/v1/user/recruiter-info",
                                 "/api/v1/company/upload-image/*",
-                                "/api/v1/user/belongs",
                                 "/api/v1/company/info/*"
                         ).hasRole("VERIFIED_RECRUITER")
                         .requestMatchers(
                                 "/api/v1/recruiter-registration-request/*"
                         ).hasRole("MANAGER")
+                        .requestMatchers(
+                                "/api/v1/user/belongs",
+                                "/api/v1/user/isApproved",
+                                "/api/v1/user/exists").hasRole("INTERNAL_SERVICE")
         );
 
         return http.build();

@@ -36,6 +36,15 @@ public class UserServiceImpl implements UserService {
     private final TokenService tokenService;
     private final UserRepository userRepository;
 
+    /**
+     * Deletes a user account from the system and associated Keycloak identity provider.
+     * Validates the current user credentials and ensures successful deletion in both the application
+     * and Keycloak system.
+     *
+     * @param userDeleteDto the request object containing the current password of the user for authentication
+     *        and deletion authorization
+     * @throws KeyCloakException if the Keycloak user deletion fails due to an external system error
+     */
     @Override
     @Transactional
     public void deleteAccount(DeleteAccountRequest userDeleteDto) {
@@ -57,6 +66,15 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    /**
+     * Updates the password for the currently authenticated user. The method validates the current password,
+     * updates the user's password in Keycloak, and verifies the change by attempting to re-authenticate the user
+     * with the new password.
+     *
+     * @param updatePasswordDto the request object containing the current password and the new password for the update
+     * @return true if the password update and re-authentication were successful; false otherwise
+     * @throws KeyCloakException if there is an error during interaction with Keycloak
+     */
     @Override
     @Transactional
     public boolean updatePassword(ChangePasswordRequest updatePasswordDto) {

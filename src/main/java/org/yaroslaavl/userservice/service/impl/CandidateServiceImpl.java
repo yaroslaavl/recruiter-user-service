@@ -64,6 +64,15 @@ public class CandidateServiceImpl extends UserInfoUpdate<
         return super.updateUserInfo(inputDto, candidateMapper);
     }
 
+    /**
+     * Updates the profile data of the authenticated candidate user.
+     * This includes details such as desired salary, availability, work mode,
+     * available hours per week, and language proficiency.
+     *
+     * @param candidateProfileDataRequest the request object containing updated candidate profile data,
+     *                                    including desired salary, availability, work mode, available hours per week,
+     *                                    and a list of languages with proficiency levels.
+     * @return a {@code Candidate*/
     @Override
     @Transactional
     public CandidateProfileDataReadDto updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest) {

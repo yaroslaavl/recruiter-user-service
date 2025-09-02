@@ -24,6 +24,15 @@ public class RoleServiceImpl implements RoleService {
 
     private final Keycloak keycloak;
 
+    /**
+     * Assigns roles to a user based on the provided {@code UserType}.
+     *
+     * This method removes all existing realm-level roles assigned to the user and replaces them with
+     * a new set of roles defined by the {@code UserType}.
+     *
+     * @param userId the unique identifier of the user to whom roles will be assigned
+     * @param userType the type of user, which determines the roles that should be assigned
+     */
     @Override
     public void assignRoles(String userId, UserType userType) {
         UsersResource usersResource = keycloak.realm(realm).users();

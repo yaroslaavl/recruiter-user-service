@@ -35,6 +35,19 @@ public class NipVerificationServiceImpl implements NipVerificationService {
 
     private static final String SERVICE_STATUS = "StatusUslugi";
 
+    /**
+     * Verifies a company based on the provided NIP (Numer Identyfikacji Podatkowej) and email.
+     * It checks if the company exists in the local repository. If not, it queries the external GUS
+     * (Polish Statistical Office) API to retrieve relevant company information.
+     *
+     * @param nip the NIP of the company to be verified
+     * @param email the email associated with the company (not used in the current implementation,
+     *              but may be required for future use or logging purposes)
+     * @return a {@link CompanyExecutedDto} containing the verified company details, either
+     *         retrieved from the local database or fetched from the external GUS API
+     * @throws RuntimeException if an error occurs during communication with the GUS API or
+     *                          if the retrieved data is invalid or unavailable
+     */
     @Override
     public CompanyExecutedDto verification(String nip, String email) {
         Optional<Company> companyByNip = companyRepository.findCompanyByNip(nip);

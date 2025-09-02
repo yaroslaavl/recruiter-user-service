@@ -39,6 +39,19 @@ public class TokenServiceImpl implements TokenService {
     private final RestTemplate restTemplate;
     private static final String KeyCloakAuthTokenUrl = "http://localhost:9090/realms/{0}/protocol/openid-connect/token";
 
+    /**
+     * Authenticates a user with the provided login credentials. If the user exists and is eligible,
+     * an authentication token is generated and returned.
+     * The method performs several validations, such as checking if the user is temporarily blocked,
+     * or if the user's account is pending approval (for recruiters).
+     *
+     * @param loginDto an object containing the user's email and password used for authentication
+     * @return an AuthTokenDto object containing the authentication token details
+     * @throws EntityNotFoundException if no user with the provided email is found
+     * @throws UserTemporaryBlockedException if the user is temporarily blocked
+     * @throws UserVerificationNotAcceptedException if the user's account status is pending approval
+     * @throws AuthLoginException if there are issues during the authentication process
+     */
     @Override
     public AuthTokenDto login(LoginDto loginDto) {
         User userByEmail = userRepository.findByEmail(loginDto.email())
@@ -62,6 +75,13 @@ public class TokenServiceImpl implements TokenService {
         return requestToken(formData, "Login for user " + loginDto.email());
     }
 
+    /**
+     * Refreshes the authentication token using the provided refresh token.
+     * This method submits the refresh token to the token service endpoint to obtain a new access token.
+     *
+     * @param refreshToken the refresh token to be used for generating a new access token
+     * @return an AuthTokenDto object containing the new access token and its associated details
+     */
     @Override
     public AuthTokenDto refreshToken(String refreshToken) {
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();

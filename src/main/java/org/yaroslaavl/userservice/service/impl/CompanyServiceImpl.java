@@ -63,6 +63,15 @@ public class CompanyServiceImpl implements CompanyService {
             Map.entry('Ż', 'Z')
     );
 
+    /**
+     * Creates a new company or retrieves an existing one based on the NIP (tax identification number).
+     * If a company with the given NIP already exists in the database, it returns that company.
+     * Otherwise, it creates a new company with the given details and persists it in the database.
+     *
+     * @param companyExecutedDto an object containing the details of the company
+     *                           including name, NIP, city, post code, street, and voivodeship
+     * @return the existing or newly created {@link Company} entity
+     */
     @Override
     @Transactional
     public Company createOrGet(CompanyExecutedDto companyExecutedDto) {
@@ -90,6 +99,17 @@ public class CompanyServiceImpl implements CompanyService {
         return companyByNip.get();
     }
 
+    /**
+     * Handles the uploading of images for a specific company. The method supports
+     * uploading multiple types of images (e.g., logo, banner) and updates the company's
+     * details with the respective image URLs.
+     *
+     * @param imageUploadDto the data transfer object that contains the image files
+     *                        to be uploaded and associated metadata
+     * @param companyId the unique identifier of the company for which the images
+     *                   are being uploaded
+     * @throws ImageUploadException if an unexpected error occurs during the image upload process
+     */
     @Override
     @Transactional
     public void uploadImage(ImageUploadDto imageUploadDto, UUID companyId) {
@@ -112,6 +132,14 @@ public class CompanyServiceImpl implements CompanyService {
         }
     }
 
+    /**
+     * Retrieves the image URL based on the specified image type and company ID.
+     *
+     * @param imageType the type of image to retrieve, such as LOGO or BANNER
+     * @param companyId the unique identifier of the company whose image is being retrieved
+     * @return the URL of the requested image if available, otherwise null
+     * @throws EntityNotFoundException if the company with the specified ID is not found
+     */
     @Override
     public String getImageObject(ImageType imageType, UUID companyId) {
         Company company = companyRepository.findById(companyId)
@@ -130,6 +158,13 @@ public class CompanyServiceImpl implements CompanyService {
         return null;
     }
 
+    /**
+     * Updates the details of a company based on the provided request and company ID.
+     * This method allows updating employee count, description, and website URL of the company.
+     *
+     * @param companyInfoRequest the request object containing updated company information
+     * @param companyId the unique identifier of the company to update
+     */
     @Override
     @Transactional
     public void updateCompanyDetails(CompanyInfoRequest companyInfoRequest, UUID companyId) {
@@ -169,6 +204,13 @@ public class CompanyServiceImpl implements CompanyService {
         return companyMapper.toDto(company);
     }
 
+    /**
+     * Searches for companies based on a keyword and returns a pageable result of company data transfer objects.
+     *
+     * @param keyword the search keyword used to filter companies by name
+     * @param pageable the pagination and sorting information
+     * @return a paginated list of CompanyReadDto objects that match the search criteria
+     */
     @Override
     public Page<CompanyReadDto> search(String keyword, Pageable pageable) {
         Specification<Company> specification = Specification

@@ -35,6 +35,14 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
 
     private static final Integer HTTP_CREATE_STATUS = 201;
 
+    /**
+     * Registers a user in Keycloak using the provided user registration details and updates the user entity
+     * with the Keycloak ID. Assigns appropriate roles based on the user's type and saves the user entity
+     * in the database. Throws an exception if the registration in Keycloak fails.
+     *
+     * @param userRegistrationDto an object containing user registration details such as email, password, first name, and last name
+     * @param user the user entity to be updated with Keycloak ID and saved in the database
+     */
     @Override
     public void registerUser(UserRegistrationDto userRegistrationDto, User user) {
         UserRepresentation userRepresentation = getUserRepresentation(userRegistrationDto);

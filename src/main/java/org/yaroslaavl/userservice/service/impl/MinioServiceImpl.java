@@ -37,6 +37,15 @@ public class MinioServiceImpl implements MinioService {
 
     private final MinioClient minioClient;
 
+    /**
+     * Uploads logos and banners to a storage service, processes the image files, and returns their URLs.
+     *
+     * @param imageUploadDto an object containing the logo and banner files to upload
+     * @param companyId the unique identifier of the company for which the images are being uploaded
+     * @return a map containing the image types (LOGO, BANNER) as keys and their corresponding URLs as values;
+     *         returns null if no images are provided
+     * @throws FileStorageException if an error occurs during the image upload or storage process
+     */
     @Override
     @SneakyThrows
     public Map<ImageType, String> upload(ImageUploadDto imageUploadDto, UUID companyId) {

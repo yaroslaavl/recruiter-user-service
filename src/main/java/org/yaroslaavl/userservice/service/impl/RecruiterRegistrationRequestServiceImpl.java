@@ -33,6 +33,16 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
     private final SecurityContextService securityContextService;
     private final UserRepository userRepository;
 
+    /**
+     * Creates a recruiter registration request for the given company and recruiter.
+     * The method checks if a request already exists for the recruiter and throws an exception if so.
+     * Otherwise, it creates and saves a new registration request with a pending status.
+     *
+     * @param company the company associated with the registration request
+     * @param recruiter the recruiter submitting the registration request
+     * @return true if the registration request is successfully created
+     * @throws RecruiterRequestCreatedException if a registration request already exists for the recruiter
+     */
     @Override
     @Transactional
     public Boolean create(Company company, Recruiter recruiter) {
@@ -50,6 +60,16 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
         return true;
     }
 
+    /**
+     * Confirms or rejects a recruiter registration request based on the provided request ID and status.
+     * Updates the account status of the associated recruiter and may also update the company status if the recruiter is the main recruiter.
+     * Saves the request after processing and sets the reviewer details from the current security context.
+     *
+     * @param registrationRequestId the unique identifier of the registration request to be confirmed or rejected
+     * @param requestStatus the desired status for the registration request (APPROVED or REJECTED)
+     * @throws EntityNotFoundException if the registration request with the provided ID and a pending status is not found
+     * @throws RecruiterAccountAlreadyApprovedException if the associated recruiter's account is already approved
+     */
     @Override
     @Transactional
     public void confirmOrRejectRegistrationRequest(UUID registrationRequestId, RequestStatus requestStatus) {

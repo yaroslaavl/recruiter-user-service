@@ -46,6 +46,28 @@ public class AuthServiceImpl implements AuthService {
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
     private final EmailFeignClient emailFeignClient;
 
+    /**
+     * Creates a new candidate account based on the provided registration details.
+     *
+     * This method verifies the provided email for validation, checks if a user
+     * with the given email already exists, and registers a new candidate in the
+     * system. It sets the candidate's account status to PROFILE_INCOMPLETE and
+     * saves the candidate's information in the repository. If any registration
+     * errors occur, an appropriate exception is thrown.
+     *
+     * @param candidateRegistrationDto the data transfer object containing the
+     *                                 candidate's registration details such as
+     *                                 email, first name, last name, phone number,
+     *                                 and LinkedIn link
+     * @return a data transfer object containing the details of the registered
+     *         candidate
+     * @throws UserAlreadyRegisteredException if a user with the given email is
+     *                                        already registered in the system
+     * @throws KeyCloakException              if there is a failure during the
+     *                                        Keycloak integration process
+     * @throws RuntimeException               if there is any other failure during
+     *                                        the registration process
+     */
     @Override
     @Transactional
     public CandidateReadDto createCandidateAccount(CandidateRegistrationDto candidateRegistrationDto) {
@@ -81,6 +103,29 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
+    /**
+     * Creates a new recruiter account based on the provided registration details.
+     *
+     * This method validates the provided email, checks if a user with the given email
+     * already exists, and registers a new recruiter account in the system. It associates
+     * the recruiter with the given company, assigns appropriate account status and company
+     * roles, and saves the recruiter's information in the database. If any registration
+     * error occurs, an appropriate exception is thrown.
+     *
+     * @param recruiterRegistrationDto the data transfer object containing the recruiter's
+     *                                 registration details such as email, first name, last
+     *                                 name, and position
+     * @param companyExecutedDto       the data transfer object containing the company details
+     *                                 required for creating or getting the company during
+     *                                 recruiter registration
+     * @return a data transfer object containing the details of the registered recruiter
+     * @throws UserAlreadyRegisteredException if a user with the given email is already
+     *                                        registered in the system
+     * @throws KeyCloakException              if there is a failure during the Keycloak
+     *                                        integration process
+     * @throws RuntimeException               if there is any other failure during the
+     *                                        registration process
+     */
     @Override
     @Transactional
     public RecruiterReadDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto, CompanyExecutedDto companyExecutedDto) {

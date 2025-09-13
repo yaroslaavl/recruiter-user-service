@@ -2,6 +2,8 @@ package org.yaroslaavl.userservice.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.Company;
@@ -14,10 +16,13 @@ import org.yaroslaavl.userservice.database.entity.enums.registrationRequest.Requ
 import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 import org.yaroslaavl.userservice.database.repository.RecruiterRegistrationRequestRepository;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
-import org.yaroslaavl.userservice.dto.request.RecruiterRegistrationRequestUpdateStatus;
+import org.yaroslaavl.userservice.dto.response.RecruiterRegistrationRequestResponseDto;
+import org.yaroslaavl.userservice.dto.response.list.PageShortDto;
+import org.yaroslaavl.userservice.dto.response.list.RecruiterRegistrationRequestShortDto;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.exception.RecruiterAccountAlreadyApprovedException;
 import org.yaroslaavl.userservice.exception.RecruiterRequestCreatedException;
+import org.yaroslaavl.userservice.mapper.RecruiterRegistrationRequestMapper;
 import org.yaroslaavl.userservice.service.RecruiterRegistrationRequestService;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 
@@ -29,6 +34,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistrationRequestService {
 
+    private final RecruiterRegistrationRequestMapper mapper;
     private final RecruiterRegistrationRequestRepository recruiterRegistrationRequestRepository;
     private final SecurityContextService securityContextService;
     private final UserRepository userRepository;
@@ -105,7 +111,40 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
 
             request.setReviewedBy(manager);
             request.setReviewedAt(LocalDateTime.now());
+            //send notification to recruiter
             recruiterRegistrationRequestRepository.save(request);
         }
+    }
+
+    /**
+     * Fetches a paginated list of filtered recruiter registration requests based on the provided status and date.
+     *
+     * @param status the status of the registration requests to filter by
+     * @param requestDateFrom the starting date to filter the registration requests
+     * @param pageable the pagination and sorting information
+     * @return a paginated response containing the filtered recruiter registration requests
+     */
+    @Override
+    public PageShortDto<RecruiterRegistrationRequestShortDto> getFilteredRequests(RequestStatus status, LocalDateTime requestDateFrom, Pageable pageable) {
+        log.info("Getting filtered requests for status: {}, from date: {}", status, requestDateFrom);
+
+        Page<RecruiterRegistrationRequest> filteredRequests = recruiterRegistrationRequestRepository.getFilteredRequests(status, requestDateFrom, pageable);
+
+        log.info("Found {} filtered requests", filteredRequests.getTotalElements());
+        return new PageShortDto<>(
+                mapper.toShortDto(filteredRequests.getContent()),
+                filteredRequests.getTotalElements(),
+                filteredRequests.getTotalPages(),
+                filteredRequests.getNumber(),
+                filteredRequests.getSize()
+        );
+    }
+
+    @Override
+    public RecruiterRegistrationRequestResponseDto getRequestById(UUID registrationRequestId) {
+        RecruiterRegistrationRequest request = recruiterRegistrationRequestRepository.findById(registrationRequestId)
+                .orElseThrow(() -> new EntityNotFoundException("Request not found"));
+
+        return mapper.toDto(request);
     }
 }

@@ -1,27 +1,31 @@
 package org.yaroslaavl.userservice.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.Candidate;
 import org.yaroslaavl.userservice.database.entity.CandidateLanguage;
 import org.yaroslaavl.userservice.database.entity.CandidateProfileData;
+import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.entity.enums.language.LanguageLevel;
 import org.yaroslaavl.userservice.database.entity.enums.language.Languages;
 import org.yaroslaavl.userservice.database.entity.enums.profile.AvailableFrom;
 import org.yaroslaavl.userservice.database.entity.enums.profile.Salary;
 import org.yaroslaavl.userservice.database.entity.enums.profile.WorkMode;
 import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
+import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 import org.yaroslaavl.userservice.database.repository.CandidateProfileDataRepository;
 import org.yaroslaavl.userservice.database.repository.CandidateRepository;
 import org.yaroslaavl.userservice.database.repository.LanguageRepository;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
-import org.yaroslaavl.userservice.dto.read.CandidateProfileDataReadDto;
-import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
+import org.yaroslaavl.userservice.dto.response.*;
 import org.yaroslaavl.userservice.dto.request.CandidateInfoRequest;
 import org.yaroslaavl.userservice.dto.request.CandidateProfileDataRequest;
 import org.yaroslaavl.userservice.dto.request.LanguageRequest;
+import org.yaroslaavl.userservice.exception.AccessInfoDeniedException;
 import org.yaroslaavl.userservice.exception.LanguagePreviousDataDeletionException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
+import org.yaroslaavl.userservice.feignClient.dto.UserFeignDto;
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.LanguageMapper;
 import org.yaroslaavl.userservice.service.CandidateService;
@@ -31,12 +35,13 @@ import org.yaroslaavl.userservice.service.UserInfoUpdate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 public class CandidateServiceImpl extends UserInfoUpdate<
         Candidate,
         CandidateInfoRequest,
-        CandidateReadDto,
+        CandidateResponseDto,
         CandidateMapper> implements CandidateService {
 
     private final LanguageRepository languageRepository;
@@ -60,7 +65,7 @@ public class CandidateServiceImpl extends UserInfoUpdate<
 
     @Override
     @Transactional
-    public CandidateReadDto updateUserInfo(CandidateInfoRequest inputDto) {
+    public CandidateResponseDto updateUserInfo(CandidateInfoRequest inputDto) {
         return super.updateUserInfo(inputDto, candidateMapper);
     }
 
@@ -75,7 +80,7 @@ public class CandidateServiceImpl extends UserInfoUpdate<
      * @return a {@code Candidate*/
     @Override
     @Transactional
-    public CandidateProfileDataReadDto updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest) {
+    public CandidateProfileDataResponseDto updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest) {
         String userEmail = securityContextService.getSecurityContext();
 
         Candidate candidate = (Candidate) userRepository.findByEmail(userEmail)
@@ -90,7 +95,7 @@ public class CandidateServiceImpl extends UserInfoUpdate<
                     .collect(Collectors.toSet());
 
             if (!idsToKeep.isEmpty()) {
-                languageRepository.deleteAllWhereIdsIsNotLike(idsToKeep);
+                languageRepository.deleteAllUserLanguagesWhereIdsIsNotLike(idsToKeep, userEmail);
             }
 
         } catch (Exception e) {
@@ -137,8 +142,56 @@ public class CandidateServiceImpl extends UserInfoUpdate<
         }
     }
 
-    private CandidateProfileDataReadDto toDto(CandidateProfileData profileData, List<CandidateLanguage> languages) {
-        return new CandidateProfileDataReadDto(
+    @Override
+    public Map<String, UserFeignDto> getFilteredCandidates(Salary salary, WorkMode workMode, Integer availableHoursPerWeek, AvailableFrom availableFrom) {
+        log.info("Filtering candidates with salary: {}, work mode: {}, available hours per week: {}, available from: {}", salary, workMode, availableHoursPerWeek, availableFrom);
+
+        List<Candidate> filteredCandidates = candidateRepository.getFilteredCandidates(salary, workMode, availableHoursPerWeek, availableFrom);
+        return filteredCandidates.stream().collect(Collectors.toMap(Candidate::getKeycloakId, candidateMapper::toFeignDto));
+    }
+
+    @Override
+    public CandidatePrivateResponseDto getPersonalData() {
+        String email = securityContextService.getSecurityContext();
+
+        if (email != null && !email.isEmpty()) {
+            Candidate candidate = candidateRepository.findByEmail(email)
+                    .orElseThrow(() -> new EntityNotFoundException("Candidate not found"));
+
+            return candidateMapper.toPrivateDto(candidate);
+        }
+
+        return null;
+    }
+
+    @Override
+    public CandidatePublicResponseDto getPublicData(String candidateKeyId) {
+        String email = securityContextService.getSecurityContext();
+
+        if (email != null && !email.isEmpty()) {
+            Candidate candidate = candidateRepository.findByKeycloakId(candidateKeyId);
+
+            boolean isMe = Objects.equals(candidateKeyId, candidate.getKeycloakId());
+
+            if (isMe) {
+                return candidateMapper.toPublicDto(candidate);
+            }
+
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+            if (user.getAccountStatus() == AccountStatus.REJECTED || user.getUserType() != UserType.RECRUITER) {
+                throw new AccessInfoDeniedException("You don't have access to this information");
+            }
+
+            return candidateMapper.toPublicDto(candidate);
+        }
+
+        return null;
+    }
+
+    private CandidateProfileDataResponseDto toDto(CandidateProfileData profileData, List<CandidateLanguage> languages) {
+        return new CandidateProfileDataResponseDto(
                 profileData.getCandidate().getId(),
                 profileData.getDesiredSalary(),
                 profileData.getWorkMode(),

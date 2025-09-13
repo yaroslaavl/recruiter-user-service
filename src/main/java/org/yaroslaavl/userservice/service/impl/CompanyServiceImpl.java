@@ -17,10 +17,14 @@ import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.database.repository.RecruiterRepository;
 import org.yaroslaavl.userservice.database.specification.CompanySpecification;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
-import org.yaroslaavl.userservice.dto.read.CompanyReadDto;
+import org.yaroslaavl.userservice.dto.response.CompanyResponseDto;
 import org.yaroslaavl.userservice.dto.request.CompanyInfoRequest;
 import org.yaroslaavl.userservice.dto.request.ImageUploadDto;
+import org.yaroslaavl.userservice.dto.response.list.CompanyShortDto;
+import org.yaroslaavl.userservice.dto.response.list.PageShortDto;
 import org.yaroslaavl.userservice.exception.*;
+import org.yaroslaavl.userservice.feignClient.dto.CompanyPreviewFeignDto;
+import org.yaroslaavl.userservice.feignClient.recruiting.RecruitingFeignClient;
 import org.yaroslaavl.userservice.mapper.CompanyMapper;
 import org.yaroslaavl.userservice.service.CompanyService;
 import org.yaroslaavl.userservice.service.MinioService;
@@ -28,9 +32,8 @@ import org.yaroslaavl.userservice.service.SecurityContextService;
 
 import java.text.Normalizer;
 
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -43,6 +46,7 @@ public class CompanyServiceImpl implements CompanyService {
     private final SecurityContextService securityContextService;
     private final RecruiterRepository recruiterRepository;
     private final CompanyMapper companyMapper;
+    private final RecruitingFeignClient recruitingFeignClient;
 
     private static final Map<Character, Character> REPLACEMENTS = Map.ofEntries(
             Map.entry('ł', 'l'),
@@ -173,31 +177,13 @@ public class CompanyServiceImpl implements CompanyService {
         Optional.ofNullable(companyInfoRequest.getEmployeeCount()).ifPresent(company::setEmployeeCount);
         Optional.ofNullable(companyInfoRequest.getDescription()).ifPresent(company::setDescription);
 
-        String websiteUrl = companyInfoRequest.getWebsiteUrl();
-        if (websiteUrl != null && !websiteUrl.isEmpty()) {
-            int indexOfCleanUrl = websiteUrl.indexOf("//");
-            String urlWithoutProtocol = websiteUrl.substring(indexOfCleanUrl + 2).toLowerCase();
-
-            int lastDot = urlWithoutProtocol.lastIndexOf(".");
-            String baseDomain;
-            if (lastDot != -1) {
-                baseDomain = urlWithoutProtocol.substring(0, lastDot);
-            } else {
-                baseDomain = urlWithoutProtocol;
-            }
-
-            String normalizedString = normalize(company.getName());
-
-            if (normalizedString.contains(baseDomain)) {
-                company.setWebsite(websiteUrl);
-            }
-        }
+        validateCompanyWebsite(companyInfoRequest, company);
 
         companyRepository.save(company);
     }
 
     @Override
-    public CompanyReadDto getCompany(UUID companyId) {
+    public CompanyResponseDto getCompany(UUID companyId) {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Company not found"));
 
@@ -212,19 +198,40 @@ public class CompanyServiceImpl implements CompanyService {
      * @return a paginated list of CompanyReadDto objects that match the search criteria
      */
     @Override
-    public Page<CompanyReadDto> search(String keyword, Pageable pageable) {
+    public PageShortDto<CompanyShortDto> getFilteredCompanies(String keyword, Pageable pageable) {
+        log.info("Getting filtered companies with keyword: {}", keyword);
+
         Specification<Company> specification = Specification
                 .where(CompanySpecification.getByName(keyword))
                 .and(CompanySpecification.hasStatus(CompanyStatus.APPROVED));
         Page<Company> companies = companyRepository.findAll(specification, pageable);
 
-        return companies.map(companyMapper::toDto);
+        Map<UUID, Long> companyVacanciesCount = recruitingFeignClient.getCompanyVacanciesCount(
+                companies.getContent()
+                        .stream()
+                        .map(Company::getId)
+                        .collect(Collectors.toSet()));
+
+        log.info("Found {} filtered companies", companies.getTotalElements());
+        return new PageShortDto<>(
+                companyMapper.toShortDto(companies.getContent(), companyVacanciesCount),
+                companies.getTotalElements(),
+                companies.getTotalPages(),
+                companies.getNumber(),
+                companies.getSize());
     }
 
     @Override
     public Company getCompanyById(UUID companyId) {
         return companyRepository.findById(companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Company not found"));
+    }
+
+    @Override
+    public Map<UUID, CompanyPreviewFeignDto> getPreviewInfo(Set<UUID> companyIds) {
+        List<Company> companiesByCompanyIds = companyRepository.findCompaniesByCompanyIds(companyIds);
+
+        return companiesByCompanyIds.stream().collect(Collectors.toMap(Company::getId, companyMapper::toPreviewFeignDto));
     }
 
     private Company checkCompanyDetails(UUID companyId) {
@@ -251,6 +258,38 @@ public class CompanyServiceImpl implements CompanyService {
         return company;
     }
 
+    private void validateCompanyWebsite(CompanyInfoRequest companyInfoRequest, Company company) {
+        String websiteUrl = companyInfoRequest.getWebsiteUrl();
+        if (websiteUrl != null && !websiteUrl.isEmpty()) {
+            int indexOfCleanUrl = websiteUrl.indexOf("//");
+            String urlWithoutProtocol = websiteUrl.substring(indexOfCleanUrl + 2).toLowerCase();
+
+            int lastDot = urlWithoutProtocol.lastIndexOf(".");
+            String baseDomain;
+            if (lastDot != -1) {
+                baseDomain = urlWithoutProtocol.substring(0, lastDot);
+            } else {
+                baseDomain = urlWithoutProtocol;
+            }
+
+            String normalizedString = normalize(company.getName());
+
+            if (normalizedString.contains(baseDomain)) {
+                company.setWebsite(websiteUrl);
+            }
+        }
+    }
+
+    /**
+     * Normalizes the given object name by performing the following steps:
+     * - Converts the input string into a normalized form to remove diacritical marks.
+     * - Transforms all characters to lowercase.
+     * - Removes all whitespace characters.
+     * - Replaces specific characters based on a predefined mapping.
+     *
+     * @param objectName the input string representing the object name to be normalized.
+     * @return the normalized string
+     */
     private String normalize(String objectName) {
         if (objectName == null) return null;
 

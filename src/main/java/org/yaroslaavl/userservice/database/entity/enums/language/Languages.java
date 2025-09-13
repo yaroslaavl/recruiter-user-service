@@ -8,5 +8,9 @@ public enum Languages {
 
     GERMAN,
 
-    POLISH
+    POLISH,
+
+    RUSSIAN,
+
+    UKRAINIAN,
 }

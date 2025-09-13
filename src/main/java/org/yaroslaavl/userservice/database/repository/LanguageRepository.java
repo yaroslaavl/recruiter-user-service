@@ -14,6 +14,6 @@ import java.util.UUID;
 public interface LanguageRepository extends JpaRepository<CandidateLanguage, UUID> {
 
     @Modifying
-    @Query("DELETE FROM CandidateLanguage cl WHERE cl.id NOT IN (:uuids)")
-    void deleteAllWhereIdsIsNotLike(@Param("uuids") Set<UUID> uuids);
+    @Query("DELETE FROM CandidateLanguage cl WHERE cl.id NOT IN (:uuids) AND cl.candidate.email = :userEmail")
+    void deleteAllUserLanguagesWhereIdsIsNotLike(@Param("uuids") Set<UUID> uuids, @Param("userEmail") String userEmail);
 }

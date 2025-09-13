@@ -1,9 +1,8 @@
-package org.yaroslaavl.userservice.dto.read;
+package org.yaroslaavl.userservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Data;
-import lombok.Value;
 import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 
 import java.time.LocalDateTime;
@@ -16,10 +15,10 @@ import java.time.LocalDateTime;
         visible = true
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(value = RecruiterReadDto.class, name = "RECRUITER"),
-        @JsonSubTypes.Type(value = CandidateReadDto.class, name = "CANDIDATE")
+        @JsonSubTypes.Type(value = RecruiterResponseDto.class, name = "RECRUITER"),
+        @JsonSubTypes.Type(value = CandidateResponseDto.class, name = "CANDIDATE")
 })
-public class UserReadDto {
+public class UserResponseDto {
 
      private String email;
 

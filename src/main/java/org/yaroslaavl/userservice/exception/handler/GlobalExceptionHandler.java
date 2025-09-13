@@ -26,6 +26,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
+    @ExceptionHandler(UserAccountStatusException.class)
+    public ResponseEntity<ErrorResponse> handleUserAccountStatusException(UserAccountStatusException uas, HttpServletRequest request) {
+        ErrorResponse errorResponse = new ErrorResponse(
+          uas.getMessage(),
+          ErrorType.TEMPORARY_BLOCKED,
+          request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(AuthLoginException.class)
     public ResponseEntity<ErrorResponse> handleAuthLogin(AuthLoginException al, HttpServletRequest request) {
         ErrorResponse errorResponse = new ErrorResponse(

@@ -1,14 +1,18 @@
 package org.yaroslaavl.userservice.service;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.enums.company.ImageType;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
-import org.yaroslaavl.userservice.dto.read.CompanyReadDto;
+import org.yaroslaavl.userservice.dto.response.CompanyResponseDto;
 import org.yaroslaavl.userservice.dto.request.CompanyInfoRequest;
 import org.yaroslaavl.userservice.dto.request.ImageUploadDto;
+import org.yaroslaavl.userservice.dto.response.list.CompanyShortDto;
+import org.yaroslaavl.userservice.dto.response.list.PageShortDto;
+import org.yaroslaavl.userservice.feignClient.dto.CompanyPreviewFeignDto;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public interface CompanyService {
@@ -21,9 +25,11 @@ public interface CompanyService {
 
     void updateCompanyDetails(CompanyInfoRequest companyInfoRequest, UUID companyId);
 
-    CompanyReadDto getCompany(UUID companyId);
+    CompanyResponseDto getCompany(UUID companyId);
 
-    Page<CompanyReadDto> search(String keyword, Pageable pageable);
+    PageShortDto<CompanyShortDto> getFilteredCompanies(String keyword, Pageable pageable);
 
     Company getCompanyById(UUID companyId);
+
+    Map<UUID, CompanyPreviewFeignDto> getPreviewInfo(Set<UUID> companyIds);
 }

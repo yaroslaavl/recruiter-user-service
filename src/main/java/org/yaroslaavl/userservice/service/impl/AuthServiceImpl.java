@@ -16,13 +16,13 @@ import org.yaroslaavl.userservice.database.repository.CompanyRepository;
 import org.yaroslaavl.userservice.database.repository.RecruiterRepository;
 import org.yaroslaavl.userservice.database.repository.UserRepository;
 import org.yaroslaavl.userservice.dto.integrations.CompanyExecutedDto;
-import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
-import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
+import org.yaroslaavl.userservice.dto.response.CandidateResponseDto;
+import org.yaroslaavl.userservice.dto.response.RecruiterResponseDto;
 import org.yaroslaavl.userservice.dto.registration.CandidateRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RecruiterRegistrationDto;
 import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.exception.UserAlreadyRegisteredException;
-import org.yaroslaavl.userservice.feignClient.email.EmailFeignClient;
+import org.yaroslaavl.userservice.feignClient.notification.NotificationFeignClient;
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.RecruiterMapper;
 import org.yaroslaavl.userservice.service.*;
@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
     private final CompanyService companyService;
     private final KeycloakRegistrationService registrationService;
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
-    private final EmailFeignClient emailFeignClient;
+    private final NotificationFeignClient notificationFeignClient;
 
     /**
      * Creates a new candidate account based on the provided registration details.
@@ -70,8 +70,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public CandidateReadDto createCandidateAccount(CandidateRegistrationDto candidateRegistrationDto) {
-        String email = emailFeignClient.checkEmailVerification(candidateRegistrationDto.getEmail());
+    public CandidateResponseDto createCandidateAccount(CandidateRegistrationDto candidateRegistrationDto) {
+        String email = notificationFeignClient.checkEmailVerification(candidateRegistrationDto.getEmail());
 
         Optional<User> candidateByEmail = userRepository.findByEmail(email);
         if (candidateByEmail.isPresent()) {
@@ -86,6 +86,7 @@ public class AuthServiceImpl implements AuthService {
                 .accountStatus(AccountStatus.PROFILE_INCOMPLETE)
                 .phoneNumber(candidateRegistrationDto.getPhoneNumber())
                 .linkedinLink(candidateRegistrationDto.getLinkedinLink())
+                .isTemporaryBlocked(Boolean.FALSE)
                 .build();
 
         try {
@@ -128,8 +129,8 @@ public class AuthServiceImpl implements AuthService {
      */
     @Override
     @Transactional
-    public RecruiterReadDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto, CompanyExecutedDto companyExecutedDto) {
-        String email = emailFeignClient.checkEmailVerification(recruiterRegistrationDto.getEmail());
+    public RecruiterResponseDto createRecruiterAccount(RecruiterRegistrationDto recruiterRegistrationDto, CompanyExecutedDto companyExecutedDto) {
+        String email = notificationFeignClient.checkEmailVerification(recruiterRegistrationDto.getEmail());
 
         Optional<User> candidateByEmail = userRepository.findByEmail(email);
         if (candidateByEmail.isPresent()) {

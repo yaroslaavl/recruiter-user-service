@@ -2,22 +2,25 @@ package org.yaroslaavl.userservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.yaroslaavl.userservice.database.entity.enums.company.ImageType;
-import org.yaroslaavl.userservice.dto.read.CompanyReadDto;
+import org.yaroslaavl.userservice.dto.response.CompanyResponseDto;
 import org.yaroslaavl.userservice.dto.request.CompanyInfoRequest;
 import org.yaroslaavl.userservice.dto.request.ImageUploadDto;
+import org.yaroslaavl.userservice.dto.response.list.CompanyShortDto;
+import org.yaroslaavl.userservice.dto.response.list.PageShortDto;
+import org.yaroslaavl.userservice.feignClient.dto.CompanyPreviewFeignDto;
 import org.yaroslaavl.userservice.service.CompanyService;
 import org.yaroslaavl.userservice.validation.Image;
 import org.yaroslaavl.userservice.validation.groups.EditAction;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -52,14 +55,18 @@ public class CompanyController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Page<CompanyReadDto>> search(@RequestParam("keyword") String keyword,
-                                                       @PageableDefault(size = 15) Pageable pageable) {
-        Page<CompanyReadDto> search = companyService.search(keyword, pageable);
-        return ResponseEntity.ok(search);
+    public ResponseEntity<PageShortDto<CompanyShortDto>> getFilteredCompanies(@RequestParam(required = false, defaultValue = "") String keyword,
+                                                                @PageableDefault(size = 15) Pageable pageable) {
+        return ResponseEntity.ok(companyService.getFilteredCompanies(keyword, pageable));
     }
 
     @GetMapping("/{companyId}")
-    public ResponseEntity<CompanyReadDto> getCompany(@PathVariable("companyId") UUID companyId) {
+    public ResponseEntity<CompanyResponseDto> getCompany(@PathVariable("companyId") UUID companyId) {
         return ResponseEntity.ok(companyService.getCompany(companyId));
+    }
+
+    @GetMapping("/preview")
+    public ResponseEntity<Map<UUID, CompanyPreviewFeignDto>> previewInfo(@RequestParam("companyIds") Set<UUID> companyIds) {
+        return ResponseEntity.ok(companyService.getPreviewInfo(companyIds));
     }
 }

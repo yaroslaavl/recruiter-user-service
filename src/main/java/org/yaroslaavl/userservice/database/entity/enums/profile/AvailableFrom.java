@@ -8,5 +8,7 @@ public enum AvailableFrom {
 
     THREE_WEEKS,
 
-    ONE_MONTH
+    ONE_MONTH,
+
+    OTHER
 }

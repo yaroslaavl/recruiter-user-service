@@ -1,8 +1,10 @@
 package org.yaroslaavl.userservice.service.impl;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -18,11 +20,12 @@ import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.exception.AuthLoginException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
-import org.yaroslaavl.userservice.exception.UserTemporaryBlockedException;
+import org.yaroslaavl.userservice.exception.UserAccountStatusException;
 import org.yaroslaavl.userservice.exception.UserVerificationNotAcceptedException;
 import org.yaroslaavl.userservice.service.TokenService;
 
 import java.text.MessageFormat;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -37,7 +40,12 @@ public class TokenServiceImpl implements TokenService {
 
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
+    private final StringRedisTemplate redisTemplate;
+
+    private static final String LOCKER_REDIS_KEY = "login:fail:{0}";
     private static final String KeyCloakAuthTokenUrl = "http://localhost:9090/realms/{0}/protocol/openid-connect/token";
+
+    private static final Integer MAX_FAILURE_ATTEMPTS = 3;
 
     /**
      * Authenticates a user with the provided login credentials. If the user exists and is eligible,
@@ -48,18 +56,14 @@ public class TokenServiceImpl implements TokenService {
      * @param loginDto an object containing the user's email and password used for authentication
      * @return an AuthTokenDto object containing the authentication token details
      * @throws EntityNotFoundException if no user with the provided email is found
-     * @throws UserTemporaryBlockedException if the user is temporarily blocked
      * @throws UserVerificationNotAcceptedException if the user's account status is pending approval
      * @throws AuthLoginException if there are issues during the authentication process
      */
     @Override
+    @Transactional(dontRollbackOn = UserAccountStatusException.class)
     public AuthTokenDto login(LoginDto loginDto) {
         User userByEmail = userRepository.findByEmail(loginDto.email())
                 .orElseThrow(() -> new EntityNotFoundException("User does not have an account"));
-
-        if (userByEmail.getIsTemporaryBlocked() == Boolean.TRUE) {
-            throw new UserTemporaryBlockedException("User is temporary blocked");
-        }
 
         if (userByEmail instanceof Recruiter recruiter) {
             if (recruiter.getAccountStatus() == AccountStatus.PENDING_APPROVAL) {
@@ -67,12 +71,19 @@ public class TokenServiceImpl implements TokenService {
             }
         }
 
+        checkAccountLocker(userByEmail);
         MultiValueMap<String, String> formData = new LinkedMultiValueMap<>();
         formData.add("grant_type", "password");
         formData.add("username", loginDto.email());
         formData.add("password", loginDto.password());
 
-        return requestToken(formData, "Login for user " + loginDto.email());
+        try {
+            AuthTokenDto tokenDto = requestToken(formData, "Login");
+            handleUserLoginSuccess(userByEmail);
+            return tokenDto;
+        } catch (HttpClientErrorException | HttpServerErrorException ex) {
+            throw new AuthLoginException("Authentication failed");
+        }
     }
 
     /**
@@ -89,6 +100,44 @@ public class TokenServiceImpl implements TokenService {
         formData.add("refresh_token", refreshToken);
 
         return requestToken(formData, "Refresh token");
+    }
+
+    private void checkAccountLocker(User user) {
+        String formattedKey = MessageFormat.format(LOCKER_REDIS_KEY, user.getEmail());
+
+        String counterStr = redisTemplate.opsForValue().get(formattedKey);
+        int counter = counterStr != null ? Integer.parseInt(counterStr) : 0;
+
+        if (counter >= MAX_FAILURE_ATTEMPTS) {
+
+            if (!user.getIsTemporaryBlocked()) {
+                user.setIsTemporaryBlocked(true);
+                userRepository.saveAndFlush(user);
+            }
+
+            throw new UserAccountStatusException("User is temporarily blocked");
+        }
+    }
+
+    private void handleUserLoginFailure(String email) {
+        log.error("User {} failed to login", email);
+        String formattedKey = MessageFormat.format(LOCKER_REDIS_KEY, email);
+
+        String counterStr = redisTemplate.opsForValue().get(formattedKey);
+        int counter = counterStr != null ? Integer.parseInt(counterStr) : 0;
+        if (counter == 0) {
+            redisTemplate.opsForValue().set(formattedKey, "1", 3, TimeUnit.HOURS);
+        } else {
+            redisTemplate.opsForValue().increment(formattedKey);
+        }
+    }
+
+    private void handleUserLoginSuccess(User user) {
+        log.info("User {} logged in successfully", user.getEmail());
+        redisTemplate.delete(MessageFormat.format(LOCKER_REDIS_KEY, user.getEmail()));
+
+        user.setIsTemporaryBlocked(Boolean.FALSE);
+        userRepository.saveAndFlush(user);
     }
 
     private AuthTokenDto requestToken(MultiValueMap<String, String> formData, String operation) {
@@ -118,6 +167,7 @@ public class TokenServiceImpl implements TokenService {
             return response.getBody();
         } catch (HttpClientErrorException | HttpServerErrorException ex) {
             log.error("Keycloak error during {}: {}", operation, ex.getResponseBodyAsString());
+            handleUserLoginFailure(formData.getFirst("username"));
             throw new AuthLoginException("Token retrieval error: " + ex.getMessage());
         }
     }

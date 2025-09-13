@@ -11,8 +11,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
-import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
-import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
+import org.yaroslaavl.userservice.dto.response.CandidateResponseDto;
+import org.yaroslaavl.userservice.dto.response.RecruiterResponseDto;
 import org.yaroslaavl.userservice.dto.registration.CandidateRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RecruiterRegistrationDto;
 import org.yaroslaavl.userservice.dto.registration.RegistrationRecruiterAndCompanyDto;
@@ -34,16 +34,16 @@ public class AuthController {
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register-candidate")
-    public ResponseEntity<CandidateReadDto> registerCandidate(
+    public ResponseEntity<CandidateResponseDto> registerCandidate(
             @RequestBody @Validated({CreateAction.class, CandidateAction.class}) CandidateRegistrationDto candidateRegistrationDto) {
 
-        CandidateReadDto candidateAccount = authKeycloakService.createCandidateAccount(candidateRegistrationDto);
+        CandidateResponseDto candidateAccount = authKeycloakService.createCandidateAccount(candidateRegistrationDto);
         return ResponseEntity.ok(candidateAccount);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/register-recruiter")
-    public ResponseEntity<RecruiterReadDto> registerRecruiter(
+    public ResponseEntity<RecruiterResponseDto> registerRecruiter(
             @RequestBody RegistrationRecruiterAndCompanyDto registrationRecruiterAndCompanyDto) {
 
         ValidatorFactory validatorFactory = Validation.buildDefaultValidatorFactory();
@@ -52,7 +52,7 @@ public class AuthController {
         Set<ConstraintViolation<RecruiterRegistrationDto>> validate =
                 validator.validate(registrationRecruiterAndCompanyDto.getRecruiter(), RecruiterAction.class, CreateAction.class);
         if (validate.isEmpty()) {
-            RecruiterReadDto recruiterAccount = authKeycloakService.createRecruiterAccount(
+            RecruiterResponseDto recruiterAccount = authKeycloakService.createRecruiterAccount(
                     registrationRecruiterAndCompanyDto.getRecruiter(),
                     registrationRecruiterAndCompanyDto.getCompany());
 

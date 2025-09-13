@@ -5,10 +5,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.yaroslaavl.userservice.dto.read.CandidateProfileDataReadDto;
-import org.yaroslaavl.userservice.dto.read.CandidateReadDto;
-import org.yaroslaavl.userservice.dto.read.RecruiterReadDto;
+import org.yaroslaavl.userservice.database.entity.enums.profile.AvailableFrom;
+import org.yaroslaavl.userservice.database.entity.enums.profile.Salary;
+import org.yaroslaavl.userservice.database.entity.enums.profile.WorkMode;
+import org.yaroslaavl.userservice.dto.response.*;
 import org.yaroslaavl.userservice.dto.request.*;
+import org.yaroslaavl.userservice.feignClient.dto.UserFeignDto;
 import org.yaroslaavl.userservice.service.CandidateService;
 import org.yaroslaavl.userservice.service.RecruiterService;
 import org.yaroslaavl.userservice.service.UserService;
@@ -16,6 +18,8 @@ import org.yaroslaavl.userservice.validation.groups.CandidateAction;
 import org.yaroslaavl.userservice.validation.groups.EditAction;
 import org.yaroslaavl.userservice.validation.groups.RecruiterAction;
 
+import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @RestController
@@ -35,6 +39,22 @@ public class UserController {
     @GetMapping("/isApproved")
     public Boolean isApproved(@RequestParam("userId") String userId) {
         return userService.isAccountApproved(userId);
+    }
+
+    @GetMapping("/batch-displayName")
+    public ResponseEntity<Map<String, String>> usersDisplayName(@RequestParam("userIds") Set<String> userIds,
+                                                          @RequestParam("currentUserEmail") String currentUserEmail) {
+        return ResponseEntity.ok(userService.usersDisplayName(userIds, currentUserEmail));
+    }
+
+    @GetMapping("/filtered-candidates")
+    public ResponseEntity<Map<String, UserFeignDto>> getFilteredCandidates(
+            @RequestParam(required = false) Salary salary,
+            @RequestParam(required = false) WorkMode workMode,
+            @RequestParam(required = false) Integer availableHoursPerWeek,
+            @RequestParam(required = false) AvailableFrom availableFrom
+    ) {
+        return ResponseEntity.ok(candidateService.getFilteredCandidates(salary, workMode, availableHoursPerWeek, availableFrom));
     }
 
     @GetMapping("/belongs")
@@ -58,20 +78,40 @@ public class UserController {
     }
 
     @PatchMapping("/profile-data")
-    public ResponseEntity<CandidateProfileDataReadDto> updateProfileData(@RequestBody CandidateProfileDataRequest candidateProfileDataRequest) {
-        CandidateProfileDataReadDto candidateProfileDataReadDto = candidateService.updateCandidateProfileData(candidateProfileDataRequest);
-        return ResponseEntity.ok(candidateProfileDataReadDto);
+    public ResponseEntity<CandidateProfileDataResponseDto> updateProfileData(@RequestBody CandidateProfileDataRequest candidateProfileDataRequest) {
+        CandidateProfileDataResponseDto candidateProfileDataResponseDto = candidateService.updateCandidateProfileData(candidateProfileDataRequest);
+        return ResponseEntity.ok(candidateProfileDataResponseDto);
     }
 
     @PatchMapping("/candidate-info")
-    public ResponseEntity<CandidateReadDto> updateCandidateInfo(@RequestBody @Validated({EditAction.class, CandidateAction.class}) CandidateInfoRequest candidateInfoRequest) {
-        CandidateReadDto candidateReadDto = candidateService.updateUserInfo(candidateInfoRequest);
-        return ResponseEntity.ok(candidateReadDto);
+    public ResponseEntity<CandidateResponseDto> updateCandidateInfo(@RequestBody @Validated({EditAction.class, CandidateAction.class}) CandidateInfoRequest candidateInfoRequest) {
+        CandidateResponseDto candidateResponseDto = candidateService.updateUserInfo(candidateInfoRequest);
+        return ResponseEntity.ok(candidateResponseDto);
     }
 
     @PatchMapping("/recruiter-info")
-    public ResponseEntity<RecruiterReadDto> updateRecruiterInfo(@RequestBody @Validated({EditAction.class, RecruiterAction.class}) RecruiterPositionRequest recruiterPositionRequest) {
-        RecruiterReadDto recruiterReadDto = recruiterService.updateUserInfo(recruiterPositionRequest);
-        return ResponseEntity.ok(recruiterReadDto);
+    public ResponseEntity<RecruiterResponseDto> updateRecruiterInfo(@RequestBody @Validated({EditAction.class, RecruiterAction.class}) RecruiterPositionRequest recruiterPositionRequest) {
+        RecruiterResponseDto recruiterResponseDto = recruiterService.updateUserInfo(recruiterPositionRequest);
+        return ResponseEntity.ok(recruiterResponseDto);
+    }
+
+    @GetMapping("/me-candidate")
+    public ResponseEntity<CandidatePrivateResponseDto> getMe() {
+        return ResponseEntity.ok(candidateService.getPersonalData());
+    }
+
+    @GetMapping("me-recruiter")
+    public ResponseEntity<RecruiterPrivateResponseDto> getMeRecruiter() {
+        return ResponseEntity.ok(recruiterService.getPersonalData());
+    }
+
+    @GetMapping("/public-candidate")
+    public ResponseEntity<CandidatePublicResponseDto> getCandidatePublicData(@RequestParam("candidateKeyId") String candidateKeyId) {
+        return ResponseEntity.ok(candidateService.getPublicData(candidateKeyId));
+    }
+
+    @GetMapping("/public-recruiter")
+    public ResponseEntity<RecruiterPublicResponseDto> getRecruiterPublicData(@RequestParam("recruiterKeyId") String recruiterKeyId) {
+        return ResponseEntity.ok(recruiterService.getPublicData(recruiterKeyId));
     }
 }

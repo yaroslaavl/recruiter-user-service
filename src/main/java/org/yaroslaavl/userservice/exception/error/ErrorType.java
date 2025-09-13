@@ -6,6 +6,8 @@ public enum ErrorType {
     ALREADY_REGISTERED,
     AUTH_LOGIN,
 
+    TEMPORARY_BLOCKED,
+
     FILE_STORAGE,
     IMAGE_UPLOAD,
 

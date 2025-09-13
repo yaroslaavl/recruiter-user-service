@@ -1,13 +1,13 @@
 package org.yaroslaavl.userservice.database.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+
+import java.util.List;
 
 @Entity
 @SuperBuilder
@@ -23,4 +23,10 @@ public class Candidate extends User {
 
     @Column(name = "linkedin_link", unique = true)
     private String linkedinLink;
+
+    @OneToOne(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private CandidateProfileData profileData;
+
+    @OneToMany(mappedBy = "candidate", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CandidateLanguage> languages;
 }

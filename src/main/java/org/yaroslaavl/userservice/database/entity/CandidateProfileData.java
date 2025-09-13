@@ -1,6 +1,8 @@
 package org.yaroslaavl.userservice.database.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.yaroslaavl.userservice.database.entity.enums.profile.AvailableFrom;
@@ -32,6 +34,8 @@ public class CandidateProfileData extends BaseEntity {
     @Column(name = "available_from", nullable = false)
     private AvailableFrom availableFrom;
 
+    @Max(value = 40)
+    @Min(value = 16)
     @Column(name = "available_hours_per_week", nullable = false)
     private Integer availableHoursPerWeek;
 }

@@ -1,11 +1,11 @@
-package org.yaroslaavl.userservice.dto.read;
+package org.yaroslaavl.userservice.dto.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class CandidateReadDto extends UserReadDto {
+public class CandidateResponseDto extends UserResponseDto {
 
     private String phoneNumber;
 

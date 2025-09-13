@@ -1,15 +1,14 @@
-package org.yaroslaavl.userservice.dto.read;
+package org.yaroslaavl.userservice.dto.response;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Value;
 import org.yaroslaavl.userservice.database.entity.enums.company.CompanyRole;
 
 import java.util.UUID;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class RecruiterReadDto extends UserReadDto {
+public class RecruiterResponseDto extends UserResponseDto {
 
     private UUID companyId;
 

@@ -45,6 +45,7 @@ public class SecurityConfig {
                                 "/api/v1/company/*",
                                 "/api/v1/mail/request-verification-candidate",
                                 "/api/v1/mail/request-verification-recruiter",
+                                "/api/v1/user/exists",
                                 "/api/v1/mail/verify-code").permitAll()
                         .requestMatchers(
                                 "/api/v1/user/account",
@@ -52,12 +53,16 @@ public class SecurityConfig {
                         ).authenticated()
                         .requestMatchers(
                                 "/api/v1/user/profile-data",
-                                "/api/v1/user/candidate-info"
+                                "/api/v1/user/candidate-info",
+                                "/api/v1/user/me-candidate",
+                                "/api/v1/user/public-candidate"
                         ).hasRole("VERIFIED_CANDIDATE")
                         .requestMatchers(
                                 "/api/v1/user/recruiter-info",
                                 "/api/v1/company/upload-image/*",
-                                "/api/v1/company/info/*"
+                                "/api/v1/company/info/*",
+                                "/api/v1/user/me-recruiter",
+                                "/api/v1/user/public-recruiter"
                         ).hasRole("VERIFIED_RECRUITER")
                         .requestMatchers(
                                 "/api/v1/recruiter-registration-request/*"
@@ -65,7 +70,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/user/belongs",
                                 "/api/v1/user/isApproved",
-                                "/api/v1/user/exists").hasRole("INTERNAL_SERVICE")
+                                "/api/v1/user/filtered-candidates",
+                                "/api/v1/user/batch-displayName").hasRole("INTERNAL_SERVICE")
         );
 
         return http.build();

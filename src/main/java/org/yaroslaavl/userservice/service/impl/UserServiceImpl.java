@@ -11,15 +11,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.yaroslaavl.userservice.database.entity.*;
 import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
+import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 import org.yaroslaavl.userservice.database.repository.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.dto.request.*;
+import org.yaroslaavl.userservice.exception.AccessInfoDeniedException;
 import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
+import org.yaroslaavl.userservice.exception.UserAccountStatusException;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.service.UserService;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -127,12 +135,39 @@ public class UserServiceImpl implements UserService {
         return false;
     }
 
+    @Override
+    public Map<String, String> usersDisplayName(Set<String> userIds, String currentUserEmail) {
+        User user = checkUserData(currentUserEmail);
+
+        if (user.getAccountStatus().equals(AccountStatus.REJECTED)) {
+            throw new UserAccountStatusException("Account status is rejected");
+        }
+
+        if (user.getUserType() != UserType.MANAGER) {
+            throw new AccessInfoDeniedException("You don't have access to this information");
+        }
+
+        List<User> users = userRepository.findUsersByUserKeycloakId(userIds);
+
+        return users.stream().collect(Collectors.toMap(User::getKeycloakId, u -> u.getFirstName() + " " + u.getLastName()));
+    }
+
     private UserActionDto changeUserData(String password) {
-        String securityContextEmail = securityContextService.getSecurityContext();
-        User user = userRepository.findByEmail(securityContextEmail)
-                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + securityContextEmail));
-        AuthTokenDto login = tokenService.login(new LoginDto(securityContextEmail, password));
+        User user = checkUserData(null);
+        AuthTokenDto login = tokenService.login(new LoginDto(user.getEmail(), password));
 
         return new UserActionDto(login.accessToken(), user);
+    }
+
+    private User checkUserData(String currentUserEmail) {
+        String email;
+        if (currentUserEmail != null) {
+            email = currentUserEmail;
+        } else {
+            email = securityContextService.getSecurityContext();
+        }
+
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with notification: " + email));
     }
 }

@@ -12,6 +12,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.yaroslaavl.userservice.broker.UserEventPublisher;
+import org.yaroslaavl.userservice.broker.dto.NotificationDto;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
 import org.yaroslaavl.userservice.database.entity.User;
 import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
@@ -23,8 +25,10 @@ import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.exception.UserAccountStatusException;
 import org.yaroslaavl.userservice.exception.UserVerificationNotAcceptedException;
 import org.yaroslaavl.userservice.service.TokenService;
+import org.yaroslaavl.userservice.util.NotificationStore;
 
 import java.text.MessageFormat;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -41,11 +45,12 @@ public class TokenServiceImpl implements TokenService {
     private final UserRepository userRepository;
     private final RestTemplate restTemplate;
     private final StringRedisTemplate redisTemplate;
+    private final UserEventPublisher  eventPublisher;
 
     private static final String LOCKER_REDIS_KEY = "login:fail:{0}";
     private static final String KeyCloakAuthTokenUrl = "http://localhost:9090/realms/{0}/protocol/openid-connect/token";
-
     private static final Integer MAX_FAILURE_ATTEMPTS = 3;
+    private static final Integer BLOCK_TIME = 3;
 
     /**
      * Authenticates a user with the provided login credentials. If the user exists and is eligible,
@@ -113,6 +118,7 @@ public class TokenServiceImpl implements TokenService {
             if (!user.getIsTemporaryBlocked()) {
                 user.setIsTemporaryBlocked(true);
                 userRepository.saveAndFlush(user);
+                eventPublisher.publishUserEvent(NotificationStore.userBlockNotification(user, BLOCK_TIME.toString()));
             }
 
             throw new UserAccountStatusException("User is temporarily blocked");
@@ -126,7 +132,7 @@ public class TokenServiceImpl implements TokenService {
         String counterStr = redisTemplate.opsForValue().get(formattedKey);
         int counter = counterStr != null ? Integer.parseInt(counterStr) : 0;
         if (counter == 0) {
-            redisTemplate.opsForValue().set(formattedKey, "1", 3, TimeUnit.HOURS);
+            redisTemplate.opsForValue().set(formattedKey, "1", BLOCK_TIME, TimeUnit.HOURS);
         } else {
             redisTemplate.opsForValue().increment(formattedKey);
         }

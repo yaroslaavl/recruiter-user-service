@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaroslaavl.userservice.broker.UserEventPublisher;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
 import org.yaroslaavl.userservice.database.entity.RecruiterRegistrationRequest;
@@ -25,6 +26,7 @@ import org.yaroslaavl.userservice.exception.RecruiterRequestCreatedException;
 import org.yaroslaavl.userservice.mapper.RecruiterRegistrationRequestMapper;
 import org.yaroslaavl.userservice.service.RecruiterRegistrationRequestService;
 import org.yaroslaavl.userservice.service.SecurityContextService;
+import org.yaroslaavl.userservice.util.NotificationStore;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -38,6 +40,8 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
     private final RecruiterRegistrationRequestRepository recruiterRegistrationRequestRepository;
     private final SecurityContextService securityContextService;
     private final UserRepository userRepository;
+    private UserEventPublisher publisher;
+    private NotificationStore store;
 
     /**
      * Creates a recruiter registration request for the given company and recruiter.
@@ -111,8 +115,8 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
 
             request.setReviewedBy(manager);
             request.setReviewedAt(LocalDateTime.now());
-            //send notification to recruiter
             recruiterRegistrationRequestRepository.save(request);
+            publisher.publishUserEvent(NotificationStore.recruiterRegistrationApprove(request.getRecruiter()));
         }
     }
 

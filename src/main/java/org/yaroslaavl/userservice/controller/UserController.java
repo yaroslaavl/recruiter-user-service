@@ -43,7 +43,7 @@ public class UserController {
 
     @GetMapping("/batch-displayName")
     public ResponseEntity<Map<String, String>> usersDisplayName(@RequestParam("userIds") Set<String> userIds,
-                                                          @RequestParam("currentUserEmail") String currentUserEmail) {
+                                                                @RequestParam("currentUserEmail") String currentUserEmail) {
         return ResponseEntity.ok(userService.usersDisplayName(userIds, currentUserEmail));
     }
 

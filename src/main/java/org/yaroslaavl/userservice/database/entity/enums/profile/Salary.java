@@ -1,8 +1,10 @@
 package org.yaroslaavl.userservice.database.entity.enums.profile;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 @Getter
+@Schema(description = "Salary")
 public enum Salary {
 
     RANGE_0_3K("0 - 3000"),

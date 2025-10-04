@@ -1,11 +1,13 @@
 package org.yaroslaavl.userservice.database.entity.enums.user;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
+@Schema(description = "UserType")
 public enum UserType {
     CANDIDATE("ROLE_VERIFIED_CANDIDATE"),
     RECRUITER("ROLE_VERIFIED_RECRUITER"),

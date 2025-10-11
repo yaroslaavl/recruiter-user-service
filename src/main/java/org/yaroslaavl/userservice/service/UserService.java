@@ -1,6 +1,7 @@
 package org.yaroslaavl.userservice.service;
 
 import org.yaroslaavl.userservice.dto.request.*;
+import org.yaroslaavl.userservice.dto.response.CurrentUser;
 
 import java.util.Map;
 import java.util.Set;
@@ -17,5 +18,5 @@ public interface UserService {
 
     Map<String, String> usersDisplayName(Set<String> userIds, String currentUserEmail);
 
-
+    CurrentUser getCurrentUser();
 }

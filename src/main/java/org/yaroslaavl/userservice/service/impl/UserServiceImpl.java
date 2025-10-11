@@ -16,10 +16,12 @@ import org.yaroslaavl.userservice.database.repository.*;
 import org.yaroslaavl.userservice.dto.AuthTokenDto;
 import org.yaroslaavl.userservice.dto.login.LoginDto;
 import org.yaroslaavl.userservice.dto.request.*;
+import org.yaroslaavl.userservice.dto.response.CurrentUser;
 import org.yaroslaavl.userservice.exception.AccessInfoDeniedException;
 import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.exception.UserAccountStatusException;
+import org.yaroslaavl.userservice.mapper.UserMapper;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.TokenService;
 import org.yaroslaavl.userservice.service.UserService;
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService {
     private final SecurityContextService securityContextService;
     private final TokenService tokenService;
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     /**
      * Deletes a user account from the system and associated Keycloak identity provider.
@@ -150,6 +153,13 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findUsersByUserKeycloakId(userIds);
 
         return users.stream().collect(Collectors.toMap(User::getKeycloakId, u -> u.getFirstName() + " " + u.getLastName()));
+    }
+
+    @Override
+    public CurrentUser getCurrentUser() {
+        User user = userRepository.findByEmail(securityContextService.getSecurityContext())
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + securityContextService.getSecurityContext()));
+        return userMapper.toCurrentUser(user);
     }
 
     private UserActionDto changeUserData(String password) {

@@ -78,21 +78,21 @@ public class UserController {
     }
 
     @PatchMapping("/profile-data")
-    public ResponseEntity<CandidateProfileDataResponseDto> updateProfileData(@RequestBody CandidateProfileDataRequest candidateProfileDataRequest) {
-        CandidateProfileDataResponseDto candidateProfileDataResponseDto = candidateService.updateCandidateProfileData(candidateProfileDataRequest);
-        return ResponseEntity.ok(candidateProfileDataResponseDto);
+    public ResponseEntity<Void> updateProfileData(@RequestBody CandidateProfileDataRequest candidateProfileDataRequest) {
+        candidateService.updateCandidateProfileData(candidateProfileDataRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/candidate-info")
     public ResponseEntity<CandidateResponseDto> updateCandidateInfo(@RequestBody @Validated({EditAction.class, CandidateAction.class}) CandidateInfoRequest candidateInfoRequest) {
-        CandidateResponseDto candidateResponseDto = candidateService.updateUserInfo(candidateInfoRequest);
-        return ResponseEntity.ok(candidateResponseDto);
+        candidateService.updateUserInfo(candidateInfoRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/recruiter-info")
-    public ResponseEntity<RecruiterResponseDto> updateRecruiterInfo(@RequestBody @Validated({EditAction.class, RecruiterAction.class}) RecruiterPositionRequest recruiterPositionRequest) {
-        RecruiterResponseDto recruiterResponseDto = recruiterService.updateUserInfo(recruiterPositionRequest);
-        return ResponseEntity.ok(recruiterResponseDto);
+    public ResponseEntity<Void> updateRecruiterInfo(@RequestBody @Validated({EditAction.class, RecruiterAction.class}) RecruiterPositionRequest recruiterPositionRequest) {
+        recruiterService.updateUserInfo(recruiterPositionRequest);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/me-candidate")
@@ -113,5 +113,10 @@ public class UserController {
     @GetMapping("/public-recruiter")
     public ResponseEntity<RecruiterPublicResponseDto> getRecruiterPublicData(@RequestParam("recruiterKeyId") String recruiterKeyId) {
         return ResponseEntity.ok(recruiterService.getPublicData(recruiterKeyId));
+    }
+
+    @GetMapping("/current")
+    public ResponseEntity<CurrentUser> getCurrentUser() {
+        return ResponseEntity.ok(userService.getCurrentUser());
     }
 }

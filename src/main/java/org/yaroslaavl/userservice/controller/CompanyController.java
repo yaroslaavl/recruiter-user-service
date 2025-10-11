@@ -48,10 +48,10 @@ public class CompanyController {
     }
 
     @PatchMapping("/info/{companyId}")
-    public ResponseEntity<String> updateCompanyDetails(@PathVariable("companyId") UUID companyId,
+    public ResponseEntity<Void> updateCompanyDetails(@PathVariable("companyId") UUID companyId,
                                                        @RequestBody @Validated(EditAction.class) CompanyInfoRequest companyInfoRequest) {
         companyService.updateCompanyDetails(companyInfoRequest, companyId);
-        return ResponseEntity.ok("Company details have changed");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")

@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public interface RecruiterService {
 
-    RecruiterResponseDto updateUserInfo(RecruiterPositionRequest inputDto);
+    void updateUserInfo(RecruiterPositionRequest inputDto);
 
     boolean isRecruiterBelongToCompany(String recruiterKeyId, UUID companyId);
 

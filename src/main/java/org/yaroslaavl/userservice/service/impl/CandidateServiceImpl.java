@@ -65,8 +65,8 @@ public class CandidateServiceImpl extends UserInfoUpdate<
 
     @Override
     @Transactional
-    public CandidateResponseDto updateUserInfo(CandidateInfoRequest inputDto) {
-        return super.updateUserInfo(inputDto, candidateMapper);
+    public void updateUserInfo(CandidateInfoRequest inputDto) {
+        super.updateUserInfo(inputDto, candidateMapper);
     }
 
     /**
@@ -77,10 +77,10 @@ public class CandidateServiceImpl extends UserInfoUpdate<
      * @param candidateProfileDataRequest the request object containing updated candidate profile data,
      *                                    including desired salary, availability, work mode, available hours per week,
      *                                    and a list of languages with proficiency levels.
-     * @return a {@code Candidate*/
+     **/
     @Override
     @Transactional
-    public CandidateProfileDataResponseDto updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest) {
+    public void updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest) {
         String userEmail = securityContextService.getSecurityContext();
 
         Candidate candidate = (Candidate) userRepository.findByEmail(userEmail)
@@ -121,9 +121,7 @@ public class CandidateServiceImpl extends UserInfoUpdate<
                     .map(WorkMode::valueOf)
                     .ifPresent(candidateProfileDataByCandidateId.get()::setWorkMode);
 
-            CandidateProfileData profileData = candidateProfileDataRepository.save(candidateProfileDataByCandidateId.get());
-
-            return toDto(profileData, languageList);
+            candidateProfileDataRepository.save(candidateProfileDataByCandidateId.get());
         } else {
             CandidateProfileData profileData = CandidateProfileData.builder()
                     .candidate(candidate)
@@ -136,9 +134,7 @@ public class CandidateServiceImpl extends UserInfoUpdate<
             candidate.setAccountStatus(AccountStatus.PROFILE_COMPLETE);
             candidateRepository.save(candidate);
 
-            CandidateProfileData savedProfile = candidateProfileDataRepository.save(profileData);
-
-            return toDto(savedProfile, languageList);
+            candidateProfileDataRepository.save(profileData);
         }
     }
 

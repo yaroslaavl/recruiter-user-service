@@ -12,9 +12,9 @@ import java.util.Map;
 
 public interface CandidateService {
 
-    CandidateProfileDataResponseDto updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest);
+    void updateCandidateProfileData(CandidateProfileDataRequest candidateProfileDataRequest);
 
-    CandidateResponseDto updateUserInfo(CandidateInfoRequest inputDto);
+    void updateUserInfo(CandidateInfoRequest inputDto);
 
     Map<String, UserFeignDto> getFilteredCandidates(Salary salary, WorkMode workMode, Integer availableHoursPerWeek, AvailableFrom availableFrom);
 

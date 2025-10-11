@@ -42,8 +42,8 @@ public class RecruiterServiceImpl extends UserInfoUpdate<Recruiter, RecruiterPos
 
     @Override
     @Transactional
-    public RecruiterResponseDto updateUserInfo(RecruiterPositionRequest inputDto) {
-        return super.updateUserInfo(inputDto, recruiterMapper);
+    public void updateUserInfo(RecruiterPositionRequest inputDto) {
+        super.updateUserInfo(inputDto, recruiterMapper);
     }
 
     @Override

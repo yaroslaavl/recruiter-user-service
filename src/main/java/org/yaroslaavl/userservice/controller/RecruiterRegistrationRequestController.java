@@ -22,19 +22,17 @@ public class RecruiterRegistrationRequestController {
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
 
     @PatchMapping("/{registrationRequestId}")
-    public ResponseEntity<String> updateRegistrationRequestStatus(@PathVariable("registrationRequestId") UUID registrationRequestId,
+    public ResponseEntity<Void> updateRegistrationRequestStatus(@PathVariable("registrationRequestId") UUID registrationRequestId,
                                                                   @RequestParam("requestStatus") String requestStatus) {
         recruiterRegistrationRequestService.confirmOrRejectRegistrationRequest(registrationRequestId, RequestStatus.valueOf(requestStatus));
-
-        String responseStatusInfo = "Status has changed to: %s".formatted(requestStatus);
-        return ResponseEntity.ok(responseStatusInfo);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
     public ResponseEntity<PageShortDto<RecruiterRegistrationRequestShortDto>> getFilteredRequests(@RequestParam(required = false) RequestStatus status,
-                                                                                                  @RequestParam(required = false) LocalDateTime requestDateFro,
+                                                                                                  @RequestParam(required = false) LocalDateTime requestDateFrom,
                                                                                                   @PageableDefault(size = 15) Pageable pageable) {
-        return ResponseEntity.ok(recruiterRegistrationRequestService.getFilteredRequests(status, requestDateFro, pageable));
+        return ResponseEntity.ok(recruiterRegistrationRequestService.getFilteredRequests(status, requestDateFrom, pageable));
     }
 
     @GetMapping("/{id}")

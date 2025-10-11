@@ -32,7 +32,7 @@ public enum UserType {
             roles.add(RECRUITER.getKeycloakRole());
         }
 
-        if (this == RECRUITER || this == MANAGER || this == ADMIN) {
+        if (this == MANAGER || this == ADMIN) {
             roles.add(CANDIDATE.getKeycloakRole());
         }
 

@@ -16,6 +16,6 @@ public class LinkedinLinkValidator implements ConstraintValidator<LinkedinLink, 
             return matcher.matches();
         }
 
-        return false;
+        return true;
     }
 }

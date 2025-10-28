@@ -145,6 +145,7 @@ public class AuthServiceImpl implements AuthService {
                 .lastName(recruiterRegistrationDto.getLastName())
                 .userType(UserType.RECRUITER)
                 .accountStatus(AccountStatus.PENDING_APPROVAL)
+                .isTemporaryBlocked(Boolean.FALSE)
                 .companyRole(companyRepository.findCompanyByIdAndRecruiterListIsEmpty(company.getId()).isEmpty() ? CompanyRole.RECRUITER : CompanyRole.ADMIN_RECRUITER)
                 .position(recruiterRegistrationDto.getPosition())
                 .build();

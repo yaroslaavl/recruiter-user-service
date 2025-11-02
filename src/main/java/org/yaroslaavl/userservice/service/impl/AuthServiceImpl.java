@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.yaroslaavl.userservice.broker.UserEventPublisher;
 import org.yaroslaavl.userservice.database.entity.Candidate;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.Recruiter;
@@ -26,6 +27,7 @@ import org.yaroslaavl.userservice.feignClient.notification.NotificationFeignClie
 import org.yaroslaavl.userservice.mapper.CandidateMapper;
 import org.yaroslaavl.userservice.mapper.RecruiterMapper;
 import org.yaroslaavl.userservice.service.*;
+import org.yaroslaavl.userservice.util.NotificationStore;
 
 import java.util.Optional;
 
@@ -45,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     private final KeycloakRegistrationService registrationService;
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
     private final NotificationFeignClient notificationFeignClient;
+    private final UserEventPublisher publisher;
 
     /**
      * Creates a new candidate account based on the provided registration details.
@@ -91,9 +94,10 @@ public class AuthServiceImpl implements AuthService {
 
         try {
             registrationService.registerUser(candidateRegistrationDto, candidate);
-            candidateRepository.save(candidate);
+            Candidate registeredUser = candidateRepository.saveAndFlush(candidate);
 
             log.info("Candidate with email: {} registered in the system", email);
+            publisher.publishUserEvent(NotificationStore.userRegistered(registeredUser));
             return candidateMapper.toDto(candidate);
         } catch (Exception e) {
             log.error("Error occurred during candidate registration", e);
@@ -157,6 +161,7 @@ public class AuthServiceImpl implements AuthService {
             recruiterRegistrationRequestService.create(company, savedRecruiter);
 
             log.info("Recruiter with email: {} registered in the system", email);
+            publisher.publishUserEvent(NotificationStore.userRegistered(savedRecruiter));
             return recruiterMapper.toDto(savedRecruiter);
         } catch (Exception e) {
             log.error("Error occurred during recruiter registration", e);

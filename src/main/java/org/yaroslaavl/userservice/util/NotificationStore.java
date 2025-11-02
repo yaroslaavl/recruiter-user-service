@@ -33,4 +33,15 @@ public class NotificationStore {
                 ))
                 .build();
     }
+
+    public static NotificationDto userRegistered(User user) {
+        return NotificationDto.builder()
+                .targetUserId(user.getKeycloakId())
+                .entityType("SYSTEM_USER_REGISTRATION")
+                .notificationType("DASHBOARD_APP")
+                .contentVariables(Map.of(
+                        "firstName", user.getFirstName()
+                ))
+                .build();
+    }
 }

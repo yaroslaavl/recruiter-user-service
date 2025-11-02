@@ -83,12 +83,11 @@ public class UserServiceImpl implements UserService {
      * with the new password.
      *
      * @param updatePasswordDto the request object containing the current password and the new password for the update
-     * @return true if the password update and re-authentication were successful; false otherwise
      * @throws KeyCloakException if there is an error during interaction with Keycloak
      */
     @Override
     @Transactional
-    public boolean updatePassword(ChangePasswordRequest updatePasswordDto) {
+    public void updatePassword(ChangePasswordRequest updatePasswordDto) {
         UserActionDto userActionDto = changeUserData(updatePasswordDto.getCurrentPassword());
         try {
             if (userActionDto.getToken() != null && !userActionDto.getToken().isEmpty()) {
@@ -98,13 +97,7 @@ public class UserServiceImpl implements UserService {
                 password.setValue(updatePasswordDto.getNewPassword());
 
                 keycloak.realm(realm).users().get(userActionDto.getUser().getKeycloakId()).resetPassword(password);
-
-                AuthTokenDto login =
-                        tokenService.login(new LoginDto(userActionDto.getUser().getEmail(), updatePasswordDto.getNewPassword()));
-
-                if (login.accessToken() != null && !login.accessToken().isEmpty()) {
-                    return true;
-                }
+                tokenService.login(new LoginDto(userActionDto.getUser().getEmail(), updatePasswordDto.getNewPassword()));
             }
         } catch (WebApplicationException we) {
             int status = we.getResponse().getStatus();
@@ -112,8 +105,6 @@ public class UserServiceImpl implements UserService {
             log.error("Failed to update user. Status: {}, Body: {}", status, body);
             throw new KeyCloakException("Failed to update user");
         }
-
-        return false;
     }
 
     @Override

@@ -71,10 +71,11 @@ public class UserController {
     }
 
     @PostMapping("/change-password")
-    public ResponseEntity<?> changeUserPassword(
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> changeUserPassword(
             @RequestBody @Validated(EditAction.class) ChangePasswordRequest updatePasswordDto) {
-        boolean isUpdated = userService.updatePassword(updatePasswordDto);
-        return ResponseEntity.ok(isUpdated ? "Password updated successfully" : "Password update error");
+        userService.updatePassword(updatePasswordDto);
+        return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/profile-data")
@@ -89,7 +90,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/recruiter-info")
+    @PostMapping("/recruiter-info")
     public ResponseEntity<Void> updateRecruiterInfo(@RequestBody @Validated({EditAction.class, RecruiterAction.class}) RecruiterPositionRequest recruiterPositionRequest) {
         recruiterService.updateUserInfo(recruiterPositionRequest);
         return ResponseEntity.noContent().build();

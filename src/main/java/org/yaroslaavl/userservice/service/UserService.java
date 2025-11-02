@@ -10,7 +10,7 @@ public interface UserService {
 
     void deleteAccount(DeleteAccountRequest userDeleteDto);
 
-    boolean updatePassword(ChangePasswordRequest resetPasswordDto);
+    void updatePassword(ChangePasswordRequest resetPasswordDto);
 
     boolean existsAccount(String email);
 

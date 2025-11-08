@@ -84,7 +84,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/candidate-info")
+    @PostMapping("/candidate-info")
     public ResponseEntity<Void> updateCandidateInfo(@RequestBody @Validated({EditAction.class, CandidateAction.class}) CandidateInfoRequest candidateInfoRequest) {
         candidateService.updateUserInfo(candidateInfoRequest);
         return ResponseEntity.noContent().build();

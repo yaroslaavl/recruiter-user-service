@@ -19,7 +19,7 @@ public abstract class UserInfoUpdate
         this.userRepository = userRepository;
     }
 
-    public O updateUserInfo(I inputDto, M mapper) {
+    public void updateUserInfo(I inputDto, M mapper) {
         if (inputDto == null) {
             throw new IllegalArgumentException("Request cannot be null");
         }
@@ -31,6 +31,6 @@ public abstract class UserInfoUpdate
 
         mapper.updateEntity(inputDto, user);
 
-        return mapper.toDto(user);
+        mapper.toDto(user);
     }
 }

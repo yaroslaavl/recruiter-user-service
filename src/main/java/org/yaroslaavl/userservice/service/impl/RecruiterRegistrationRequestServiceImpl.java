@@ -42,8 +42,7 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
     private final RecruiterRegistrationRequestRepository recruiterRegistrationRequestRepository;
     private final SecurityContextService securityContextService;
     private final UserRepository userRepository;
-    private UserEventPublisher publisher;
-    private NotificationStore store;
+    private final UserEventPublisher publisher;
 
     /**
      * Creates a recruiter registration request for the given company and recruiter.
@@ -85,7 +84,7 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
     @Override
     @Transactional
     public void confirmOrRejectRegistrationRequest(UUID registrationRequestId, RequestStatus requestStatus) {
-        RecruiterRegistrationRequest request = recruiterRegistrationRequestRepository.findByIdAndRequestStatus(registrationRequestId, RequestStatus.PENDING)
+        RecruiterRegistrationRequest request = recruiterRegistrationRequestRepository.findRecruiterRegistrationRequestById(registrationRequestId)
                 .orElseThrow(() -> new EntityNotFoundException("Registration request not found"));
 
         if (request.getRecruiter().getAccountStatus() == AccountStatus.APPROVED) {
@@ -156,8 +155,9 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
     }
 
     @Override
+    @Transactional(readOnly = true)
     public RecruiterRegistrationRequestResponseDto getRequestById(UUID registrationRequestId) {
-        RecruiterRegistrationRequest request = recruiterRegistrationRequestRepository.findById(registrationRequestId)
+        RecruiterRegistrationRequest request = recruiterRegistrationRequestRepository.findRecruiterRegistrationRequestById(registrationRequestId)
                 .orElseThrow(() -> new EntityNotFoundException("Request not found"));
 
         return mapper.toDto(request);

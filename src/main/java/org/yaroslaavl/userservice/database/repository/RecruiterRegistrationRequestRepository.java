@@ -19,8 +19,6 @@ public interface RecruiterRegistrationRequestRepository extends JpaRepository<Re
 
     boolean existsByRecruiterId(UUID recruiterId);
 
-    Optional<RecruiterRegistrationRequest> findByIdAndRequestStatus(UUID requestId, RequestStatus requestStatus);
-
     @EntityGraph(attributePaths = {"recruiter", "reviewedBy", "company"})
     @Query(value = """
     SELECT rrr FROM RecruiterRegistrationRequest rrr
@@ -36,4 +34,11 @@ public interface RecruiterRegistrationRequestRepository extends JpaRepository<Re
                                                            @NotNull LocalDateTime selectedDateStart,
                                                            @NotNull LocalDateTime selectedDateEnd,
                                                            Pageable pageable);
+
+
+    @Query("""
+    SELECT rrr FROM RecruiterRegistrationRequest rrr
+    WHERE rrr.id = :id
+    """)
+    Optional<RecruiterRegistrationRequest> findRecruiterRegistrationRequestById(@NotNull UUID id);
 }

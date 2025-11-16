@@ -21,7 +21,7 @@ public class RecruiterRegistrationRequestController {
 
     private final RecruiterRegistrationRequestService recruiterRegistrationRequestService;
 
-    @PatchMapping("/{registrationRequestId}")
+    @PostMapping("/{registrationRequestId}")
     public ResponseEntity<Void> updateRegistrationRequestStatus(@PathVariable("registrationRequestId") UUID registrationRequestId,
                                                                   @RequestParam("status") RequestStatus status) {
         recruiterRegistrationRequestService.confirmOrRejectRegistrationRequest(registrationRequestId, status);

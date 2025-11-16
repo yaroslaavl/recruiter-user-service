@@ -1,7 +1,9 @@
 package org.yaroslaavl.userservice.database.repository;
 
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -19,11 +21,19 @@ public interface RecruiterRegistrationRequestRepository extends JpaRepository<Re
 
     Optional<RecruiterRegistrationRequest> findByIdAndRequestStatus(UUID requestId, RequestStatus requestStatus);
 
-    @Query("""
+    @EntityGraph(attributePaths = {"recruiter", "reviewedBy", "company"})
+    @Query(value = """
     SELECT rrr FROM RecruiterRegistrationRequest rrr
     WHERE (:status IS NULL OR rrr.requestStatus = :status)
-    AND (:requestDateFrom IS NULL OR rrr.createdAt >= :requestDateFrom)
-    ORDER BY rrr.createdAt ASC
+    AND (rrr.createdAt BETWEEN :selectedDateStart AND :selectedDateEnd)
+    ORDER BY rrr.createdAt DESC
+    """, countQuery = """
+    SELECT COUNT(rrr) FROM RecruiterRegistrationRequest rrr
+    WHERE (:status IS NULL OR rrr.requestStatus = :status)
+    AND (rrr.createdAt BETWEEN :selectedDateStart AND :selectedDateEnd)
     """)
-    Page<RecruiterRegistrationRequest> getFilteredRequests(RequestStatus status, LocalDateTime requestDateFrom, Pageable pageable);
+    Page<RecruiterRegistrationRequest> getFilteredRequests(RequestStatus status,
+                                                           @NotNull LocalDateTime selectedDateStart,
+                                                           @NotNull LocalDateTime selectedDateEnd,
+                                                           Pageable pageable);
 }

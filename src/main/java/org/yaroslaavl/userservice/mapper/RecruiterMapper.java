@@ -22,6 +22,7 @@ public interface RecruiterMapper extends BaseMapper<RecruiterResponseDto, Recrui
 
     @Mapping(target = "displayName", expression = "java(getRecruiterFirstAndLastName(recruiter))")
     @Mapping(target = "companyName", source = "company.name")
+    @Mapping(target = "companyId", source = "company.id")
     RecruiterPrivateResponseDto toPrivateDto(Recruiter recruiter);
 
     @Mapping(target = "displayName", expression = "java(getRecruiterFirstAndLastName(recruiter))")

@@ -13,5 +13,5 @@ public record RecruiterRegistrationRequestShortDto(
         @NotBlank String companyName,
         @NotNull RequestStatus requestStatus,
         String reviewedBy,
-        LocalDateTime createdAt
+        @NotNull LocalDateTime createdAt
 ) { }

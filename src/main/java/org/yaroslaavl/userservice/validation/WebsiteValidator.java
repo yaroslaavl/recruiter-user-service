@@ -7,10 +7,10 @@ public class WebsiteValidator implements ConstraintValidator<Website, String> {
 
     @Override
     public boolean isValid(String website, ConstraintValidatorContext constraintValidatorContext) {
-        if (website == null || website.isEmpty()) {
-            return false;
+        if (website != null && !website.isEmpty()) {
+            return website.startsWith("https://");
         }
 
-        return website.startsWith("https://");
+        return true;
     }
 }

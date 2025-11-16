@@ -52,7 +52,6 @@ public class RecruiterServiceImpl extends UserInfoUpdate<Recruiter, RecruiterPos
                  .orElseThrow(() -> new EntityNotFoundException("Recruiter not found"));
 
         Company company = companyService.getCompanyById(companyId);
-
         return recruiterByKeycloakId.getCompany().getId().equals(company.getId());
     }
 

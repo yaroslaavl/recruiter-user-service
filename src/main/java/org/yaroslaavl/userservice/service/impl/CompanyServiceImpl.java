@@ -3,7 +3,9 @@ package org.yaroslaavl.userservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +31,7 @@ import org.yaroslaavl.userservice.mapper.CompanyMapper;
 import org.yaroslaavl.userservice.service.CompanyService;
 import org.yaroslaavl.userservice.service.MinioService;
 import org.yaroslaavl.userservice.service.SecurityContextService;
+import org.yaroslaavl.userservice.service.UserService;
 
 import java.text.Normalizer;
 
@@ -66,6 +69,9 @@ public class CompanyServiceImpl implements CompanyService {
             Map.entry('ż', 'z'),
             Map.entry('Ż', 'Z')
     );
+
+    private static final List<CompanyStatus> FOR_USER= List.of(CompanyStatus.APPROVED, CompanyStatus.FROZEN);
+    private final UserService userService;
 
     /**
      * Creates a new company or retrieves an existing one based on the NIP (tax identification number).
@@ -187,7 +193,9 @@ public class CompanyServiceImpl implements CompanyService {
         Company company = companyRepository.findById(companyId)
                 .orElseThrow(() -> new EntityNotFoundException("Company not found"));
 
-        return companyMapper.toDto(company);
+        Map<UUID, Long> companyVacanciesCount = recruitingFeignClient.getCompanyVacanciesCount(Set.of(company.getId()));
+
+        return companyMapper.toDto(company, companyVacanciesCount);
     }
 
     /**
@@ -200,11 +208,12 @@ public class CompanyServiceImpl implements CompanyService {
     @Override
     public PageShortDto<CompanyShortDto> getFilteredCompanies(String keyword, Pageable pageable) {
         log.info("Getting filtered companies with keyword: {}", keyword);
+        PageRequest pageRequest = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),  Sort.by(Sort.Direction.DESC, "createdAt"));
 
         Specification<Company> specification = Specification
                 .where(CompanySpecification.getByName(keyword))
-                .and(CompanySpecification.hasStatus(CompanyStatus.APPROVED));
-        Page<Company> companies = companyRepository.findAll(specification, pageable);
+                .and(CompanySpecification.hasStatus(FOR_USER));
+        Page<Company> companies = companyRepository.findAll(specification, pageRequest);
 
         Map<UUID, Long> companyVacanciesCount = recruitingFeignClient.getCompanyVacanciesCount(
                 companies.getContent()
@@ -260,7 +269,7 @@ public class CompanyServiceImpl implements CompanyService {
 
     private void validateCompanyWebsite(CompanyInfoRequest companyInfoRequest, Company company) {
         String websiteUrl = companyInfoRequest.getWebsiteUrl();
-        if (websiteUrl != null && !websiteUrl.isEmpty()) {
+        if (websiteUrl != null && websiteUrl.length() > 1) {
             int indexOfCleanUrl = websiteUrl.indexOf("//");
             String urlWithoutProtocol = websiteUrl.substring(indexOfCleanUrl + 2).toLowerCase();
 
@@ -277,6 +286,8 @@ public class CompanyServiceImpl implements CompanyService {
             if (normalizedString.contains(baseDomain)) {
                 company.setWebsite(websiteUrl);
             }
+        } else  {
+            company.setWebsite(websiteUrl);
         }
     }
 

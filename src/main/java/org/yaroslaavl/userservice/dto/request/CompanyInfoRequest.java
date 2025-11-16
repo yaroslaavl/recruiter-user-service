@@ -14,7 +14,7 @@ public class CompanyInfoRequest {
     @Min(value = 1, message = "{company.request.info.size.employee}", groups = EditAction.class)
     private Integer employeeCount;
 
-    @Size(min = 10, max = 500, message = "{company.request.info.size.description}", groups = EditAction.class)
+    @Size(max = 500, message = "{company.request.info.size.description}", groups = EditAction.class)
     private String description;
 
     @Website(groups = EditAction.class)

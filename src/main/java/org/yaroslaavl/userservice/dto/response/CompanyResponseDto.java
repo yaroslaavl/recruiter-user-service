@@ -14,6 +14,7 @@ public record CompanyResponseDto(String name,
                                  String description,
                                  String logoUrl,
                                  String bannerUrl,
+                                 Long vacancies,
                                  CompanyStatus companyStatus,
                                  LocalDateTime createdAt) {
 }

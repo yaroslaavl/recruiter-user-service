@@ -47,7 +47,7 @@ public class CompanyController {
         return ResponseEntity.ok(imageObject);
     }
 
-    @PatchMapping("/info/{companyId}")
+    @PostMapping("/info/{companyId}")
     public ResponseEntity<Void> updateCompanyDetails(@PathVariable("companyId") UUID companyId,
                                                        @RequestBody @Validated(EditAction.class) CompanyInfoRequest companyInfoRequest) {
         companyService.updateCompanyDetails(companyInfoRequest, companyId);

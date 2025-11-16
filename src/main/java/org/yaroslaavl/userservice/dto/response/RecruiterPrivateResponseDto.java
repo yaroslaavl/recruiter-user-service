@@ -7,6 +7,7 @@ import org.yaroslaavl.userservice.database.entity.enums.user.AccountStatus;
 import org.yaroslaavl.userservice.database.entity.enums.user.UserType;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record RecruiterPrivateResponseDto(
         @NotBlank String email,
@@ -14,6 +15,7 @@ public record RecruiterPrivateResponseDto(
         @NotNull UserType userType,
         @NotNull AccountStatus accountStatus,
         @NotBlank String position,
+        @NotNull UUID companyId,
         @NotBlank String companyName,
         @NotNull CompanyRole companyRole,
         @NotNull LocalDateTime createdAt

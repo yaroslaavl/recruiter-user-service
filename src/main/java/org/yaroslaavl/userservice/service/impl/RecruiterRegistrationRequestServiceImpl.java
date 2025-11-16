@@ -28,7 +28,9 @@ import org.yaroslaavl.userservice.service.RecruiterRegistrationRequestService;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.util.NotificationStore;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Slf4j
@@ -129,10 +131,19 @@ public class RecruiterRegistrationRequestServiceImpl implements RecruiterRegistr
      * @return a paginated response containing the filtered recruiter registration requests
      */
     @Override
-    public PageShortDto<RecruiterRegistrationRequestShortDto> getFilteredRequests(RequestStatus status, LocalDateTime requestDateFrom, Pageable pageable) {
+    public PageShortDto<RecruiterRegistrationRequestShortDto> getFilteredRequests(RequestStatus status, LocalDate requestDateFrom, Pageable pageable) {
         log.info("Getting filtered requests for status: {}, from date: {}", status, requestDateFrom);
 
-        Page<RecruiterRegistrationRequest> filteredRequests = recruiterRegistrationRequestRepository.getFilteredRequests(status, requestDateFrom, pageable);
+        LocalDateTime selectedDateStart = LocalDateTime.of(2025, 1, 1, 0, 0);
+        LocalDateTime selectedDateEnd = LocalDateTime.now();
+
+        if (requestDateFrom != null) {
+            selectedDateStart = requestDateFrom.atStartOfDay();
+            selectedDateEnd = requestDateFrom.atTime(LocalTime.MAX);
+        }
+
+
+        Page<RecruiterRegistrationRequest> filteredRequests = recruiterRegistrationRequestRepository.getFilteredRequests(status, selectedDateStart, selectedDateEnd, pageable);
 
         log.info("Found {} filtered requests", filteredRequests.getTotalElements());
         return new PageShortDto<>(

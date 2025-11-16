@@ -8,7 +8,7 @@ import org.yaroslaavl.userservice.dto.response.RecruiterRegistrationRequestRespo
 import org.yaroslaavl.userservice.dto.response.list.PageShortDto;
 import org.yaroslaavl.userservice.dto.response.list.RecruiterRegistrationRequestShortDto;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 public interface RecruiterRegistrationRequestService {
@@ -17,7 +17,7 @@ public interface RecruiterRegistrationRequestService {
 
     void confirmOrRejectRegistrationRequest(UUID registrationRequestId, RequestStatus requestStatus);
 
-    PageShortDto<RecruiterRegistrationRequestShortDto> getFilteredRequests(RequestStatus status, LocalDateTime requestDateFrom, Pageable pageable);
+    PageShortDto<RecruiterRegistrationRequestShortDto> getFilteredRequests(RequestStatus status, LocalDate requestDateFrom, Pageable pageable);
 
     RecruiterRegistrationRequestResponseDto getRequestById(UUID registrationRequestId);
 }

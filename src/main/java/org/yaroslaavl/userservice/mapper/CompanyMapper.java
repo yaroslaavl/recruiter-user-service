@@ -17,7 +17,8 @@ public interface CompanyMapper {
 
     CompanyExecutedDto toExecutedDto(Company company);
 
-    CompanyResponseDto toDto(Company company);
+    @Mapping(target = "vacancies", expression = "java(getCompanyVacanciesCount(company, companyVacanciesCount))")
+    CompanyResponseDto toDto(Company company, Map<UUID, Long> companyVacanciesCount);
 
     @Mapping(target = "vacancies", expression = "java(getCompanyVacanciesCount(company, companyVacanciesCount))")
     CompanyShortDto toShortDto(Company company, Map<UUID, Long> companyVacanciesCount);

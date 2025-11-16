@@ -78,7 +78,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/profile-data")
+    @PostMapping("/profile-data")
     public ResponseEntity<Void> updateProfileData(@RequestBody CandidateProfileDataRequest candidateProfileDataRequest) {
         candidateService.updateCandidateProfileData(candidateProfileDataRequest);
         return ResponseEntity.noContent().build();

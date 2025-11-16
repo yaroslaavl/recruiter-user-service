@@ -4,6 +4,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.yaroslaavl.userservice.database.entity.Company;
 import org.yaroslaavl.userservice.database.entity.enums.company.CompanyStatus;
 
+import java.util.List;
+
 public class CompanySpecification {
 
     public static Specification<Company> getByName(String keyword) {
@@ -15,18 +17,17 @@ public class CompanySpecification {
                 return criteriaBuilder.disjunction();
             }
 
-            query.orderBy(criteriaBuilder.asc(root.get("name")));
             return criteriaBuilder.like(criteriaBuilder.lower(root.get("name")), keyword.toLowerCase() + "%");
         };
     }
 
-    public static Specification<Company> hasStatus(CompanyStatus companyStatus) {
+    public static Specification<Company> hasStatus(List<CompanyStatus> companyStatuses) {
         return (root, query, criteriaBuilder) -> {
-            if (companyStatus == null || companyStatus.toString().isEmpty()) {
+            if (companyStatuses == null || companyStatuses.isEmpty()) {
                 return criteriaBuilder.disjunction();
             }
 
-            return criteriaBuilder.equal(root.get("companyStatus"), companyStatus);
+            return root.get("companyStatus").in(companyStatuses);
         };
     }
 }

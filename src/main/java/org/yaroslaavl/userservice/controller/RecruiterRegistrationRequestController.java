@@ -11,7 +11,7 @@ import org.yaroslaavl.userservice.dto.response.list.PageShortDto;
 import org.yaroslaavl.userservice.dto.response.list.RecruiterRegistrationRequestShortDto;
 import org.yaroslaavl.userservice.service.RecruiterRegistrationRequestService;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
@@ -23,14 +23,14 @@ public class RecruiterRegistrationRequestController {
 
     @PatchMapping("/{registrationRequestId}")
     public ResponseEntity<Void> updateRegistrationRequestStatus(@PathVariable("registrationRequestId") UUID registrationRequestId,
-                                                                  @RequestParam("requestStatus") String requestStatus) {
-        recruiterRegistrationRequestService.confirmOrRejectRegistrationRequest(registrationRequestId, RequestStatus.valueOf(requestStatus));
+                                                                  @RequestParam("status") RequestStatus status) {
+        recruiterRegistrationRequestService.confirmOrRejectRegistrationRequest(registrationRequestId, status);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/search")
     public ResponseEntity<PageShortDto<RecruiterRegistrationRequestShortDto>> getFilteredRequests(@RequestParam(required = false) RequestStatus status,
-                                                                                                  @RequestParam(required = false) LocalDateTime requestDateFrom,
+                                                                                                  @RequestParam(required = false) LocalDate requestDateFrom,
                                                                                                   @PageableDefault(size = 15) Pageable pageable) {
         return ResponseEntity.ok(recruiterRegistrationRequestService.getFilteredRequests(status, requestDateFrom, pageable));
     }

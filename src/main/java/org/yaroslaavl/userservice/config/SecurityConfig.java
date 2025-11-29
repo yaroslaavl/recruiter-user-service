@@ -52,20 +52,20 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/v1/user/account",
                                 "/api/v1/user/change-password",
-                                "/api/v1/user/current"
+                                "/api/v1/user/current",
+                                "/api/v1/user/public-candidate",
+                                "/api/v1/user/public-recruiter"
                         ).authenticated()
                         .requestMatchers(
                                 "/api/v1/user/profile-data",
                                 "/api/v1/user/candidate-info",
-                                "/api/v1/user/me-candidate",
-                                "/api/v1/user/public-candidate"
+                                "/api/v1/user/me-candidate"
                         ).hasRole("VERIFIED_CANDIDATE")
                         .requestMatchers(
                                 "/api/v1/user/recruiter-info",
                                 "/api/v1/company/upload-image/*",
                                 "/api/v1/company/info/*",
-                                "/api/v1/user/me-recruiter",
-                                "/api/v1/user/public-recruiter"
+                                "/api/v1/user/me-recruiter"
                         ).hasRole("VERIFIED_RECRUITER")
                         .requestMatchers(
                                 "/api/v1/recruiter-registration-request/*"

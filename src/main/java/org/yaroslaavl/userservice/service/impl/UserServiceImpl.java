@@ -21,6 +21,7 @@ import org.yaroslaavl.userservice.exception.AccessInfoDeniedException;
 import org.yaroslaavl.userservice.exception.KeyCloakException;
 import org.yaroslaavl.userservice.exception.EntityNotFoundException;
 import org.yaroslaavl.userservice.exception.UserAccountStatusException;
+import org.yaroslaavl.userservice.feignClient.dto.UserShortDto;
 import org.yaroslaavl.userservice.mapper.UserMapper;
 import org.yaroslaavl.userservice.service.SecurityContextService;
 import org.yaroslaavl.userservice.service.TokenService;
@@ -151,6 +152,14 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findByEmail(securityContextService.getSecurityContext())
                 .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + securityContextService.getSecurityContext()));
         return userMapper.toCurrentUser(user);
+    }
+
+    @Override
+    public UserShortDto getUserShortInfo(String userId) {
+        User user = userRepository.findByKeycloakId(userId)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with id: " + userId));
+
+        return userMapper.toShortDto(user);
     }
 
     private UserActionDto changeUserData(String password) {

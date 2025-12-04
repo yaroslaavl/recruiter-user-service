@@ -74,6 +74,7 @@ public class SecurityConfig {
                                 "/api/v1/user/belongs",
                                 "/api/v1/user/isApproved",
                                 "/api/v1/user/filtered-candidates",
+                                "/api/v1/user/short-info",
                                 "/api/v1/user/batch-displayName").hasRole("INTERNAL_SERVICE")
         );
 

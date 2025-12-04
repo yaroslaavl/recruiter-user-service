@@ -11,6 +11,7 @@ import org.yaroslaavl.userservice.database.entity.enums.profile.WorkMode;
 import org.yaroslaavl.userservice.dto.response.*;
 import org.yaroslaavl.userservice.dto.request.*;
 import org.yaroslaavl.userservice.feignClient.dto.UserFeignDto;
+import org.yaroslaavl.userservice.feignClient.dto.UserShortDto;
 import org.yaroslaavl.userservice.service.CandidateService;
 import org.yaroslaavl.userservice.service.RecruiterService;
 import org.yaroslaavl.userservice.service.UserService;
@@ -45,6 +46,11 @@ public class UserController {
     public ResponseEntity<Map<String, String>> usersDisplayName(@RequestParam("userIds") Set<String> userIds,
                                                                 @RequestParam("currentUserEmail") String currentUserEmail) {
         return ResponseEntity.ok(userService.usersDisplayName(userIds, currentUserEmail));
+    }
+
+    @GetMapping("/short-info")
+    public ResponseEntity<UserShortDto> getUserShortInfo(@RequestParam("userId") String userId) {
+        return ResponseEntity.ok(userService.getUserShortInfo(userId));
     }
 
     @GetMapping("/filtered-candidates")

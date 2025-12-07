@@ -138,7 +138,7 @@ public class UserServiceImpl implements UserService {
             throw new UserAccountStatusException("Account status is rejected");
         }
 
-        if (user.getUserType() != UserType.MANAGER) {
+        if (user.getUserType() != UserType.MANAGER && user.getUserType() != UserType.ADMIN) {
             throw new AccessInfoDeniedException("You don't have access to this information");
         }
 

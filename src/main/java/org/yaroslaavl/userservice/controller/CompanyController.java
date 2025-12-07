@@ -32,12 +32,12 @@ public class CompanyController {
     private final CompanyService companyService;
 
     @PostMapping(value = "/upload-image/{companyId}")
-    public ResponseEntity<String> upload(@RequestParam(name = "logo", required = false) @Image(type = ImageType.LOGO) MultipartFile logo,
+    public ResponseEntity<Void> upload(@RequestParam(name = "logo", required = false) @Image(type = ImageType.LOGO) MultipartFile logo,
                                          @RequestParam(name = "banner", required = false) @Image(type = ImageType.BANNER) MultipartFile banner,
                                          @PathVariable("companyId") UUID companyId) {
         ImageUploadDto imageUploadDto = new ImageUploadDto(logo, banner);
         companyService.uploadImage(imageUploadDto, companyId);
-        return ResponseEntity.ok("Image uploaded successfully");
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/image/{companyId}")

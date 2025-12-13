@@ -50,59 +50,38 @@ public class MinioServiceImpl implements MinioService {
     @SneakyThrows
     public Map<ImageType, String> upload(ImageUploadDto imageUploadDto, UUID companyId) {
 
-        HashMap<ImageType, String> logoAndBannerUrls = new HashMap<>();
+        HashMap<ImageType, String> result = new HashMap<>();
 
-        try {
-            if ((imageUploadDto.getLogo() == null || imageUploadDto.getLogo().isEmpty())
-                    && (imageUploadDto.getBanner() == null || imageUploadDto.getBanner().isEmpty())) {
-                return null;
-            }
-
-            boolean isPresent = minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());
-            if (!isPresent) {
-                minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
-            }
-
-            String policy = """
-                    {
-                      "Version": "2012-10-17",
-                      "Statement": [
-                        {
-                          "Effect": "Allow",
-                          "Principal": "*",
-                          "Action": "s3:GetObject",
-                          "Resource": "arn:aws:s3:::%s/*"
-                        }
-                      ]
-                    }
-                    """.formatted(bucket);
-
-            minioClient.setBucketPolicy(SetBucketPolicyArgs.builder()
-                    .bucket(bucket)
-                    .config(policy)
-                    .build());
-            if (imageUploadDto.getLogo() != null && !imageUploadDto.getLogo().isEmpty()) {
-                String logoUrl = imageProcessing(ImageType.LOGO, imageUploadDto.getLogo(), companyId);
-                logoAndBannerUrls.put(ImageType.LOGO, logoUrl);
-            }
-
-            if (imageUploadDto.getBanner() != null && !imageUploadDto.getBanner().isEmpty()) {
-                String bannerUrl = imageProcessing(ImageType.BANNER, imageUploadDto.getBanner(), companyId);
-                logoAndBannerUrls.put(ImageType.BANNER, bannerUrl);
-            }
-
-            return logoAndBannerUrls;
-        } catch (MinioException me) {
-            log.warn("Error occurred: {}", String.valueOf(me));
-            log.warn("HTTP trace: {}", me.httpTrace());
-            throw new FileStorageException("Could not store file in MinIO", me);
+        if ((imageUploadDto.getLogo() == null || imageUploadDto.getLogo().isEmpty())
+                && (imageUploadDto.getBanner() == null || imageUploadDto.getBanner().isEmpty())) {
+            return null;
         }
+
+        ensureBucketExistsAndPublic();
+
+        if (imageUploadDto.getLogo() != null && !imageUploadDto.getLogo().isEmpty()) {
+            String logoObject = imageProcessing(ImageType.LOGO, imageUploadDto.getLogo(), companyId);
+            result.put(ImageType.LOGO, logoObject);
+        }
+
+        if (imageUploadDto.getBanner() != null && !imageUploadDto.getBanner().isEmpty()) {
+            String bannerObject = imageProcessing(ImageType.BANNER, imageUploadDto.getBanner(), companyId);
+            result.put(ImageType.BANNER, bannerObject);
+        }
+
+        return result;
     }
 
     @Override
     public String getObject(ImageType type, UUID companyId) {
         String formattedFolder = MessageFormat.format(folder, type);
-        return objectExist(formattedFolder, companyId);
+        String objectName = objectExist(formattedFolder, companyId);
+
+        if (objectName == null) {
+            return null;
+        }
+
+        return minioUrl + "/" + bucket + "/" + objectName;
     }
 
     private String imageProcessing(ImageType imageType, MultipartFile file, UUID companyId) {
@@ -113,74 +92,85 @@ public class MinioServiceImpl implements MinioService {
         String formattedFolder = MessageFormat.format(folder, imageType);
         String extension = getExtension(file);
 
-        String image = objectExist(formattedFolder, companyId);
-
-        if (image != null && !image.isEmpty()) {
-            removeObject(image);
+        String existing = objectExist(formattedFolder, companyId);
+        if (existing != null) {
+            removeObject(existing);
         }
 
-        putObject(bucket, formattedFolder, companyId, file, extension);
+        String objectName = formattedFolder + companyId + "." + extension;
+        putObject(bucket, objectName, file);
 
-        return minioUrl + "/" + bucket + "/" + formattedFolder + companyId + "." + extension;
+        return objectName;
     }
 
     @SneakyThrows
-    private void removeObject(String file) {
-        try {
-            minioClient.removeObject(RemoveObjectArgs.builder()
-                    .bucket(bucket)
-                    .object(file)
-                    .build());
-        } catch (MinioException e) {
-            log.warn("Failed to remove object from storage", e);
-            throw new FileStorageException("Failed to remove", e);
-        }
+    private void putObject(String bucket, String objectName, MultipartFile file) {
+        minioClient.putObject(
+                PutObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .stream(file.getInputStream(), file.getSize(), -1)
+                        .contentType(file.getContentType())
+                        .build()
+        );
+    }
+
+    @SneakyThrows
+    private void removeObject(String objectName) {
+        minioClient.removeObject(
+                RemoveObjectArgs.builder()
+                        .bucket(bucket)
+                        .object(objectName)
+                        .build()
+        );
     }
 
     @SneakyThrows
     private String objectExist(String formattedFolder, UUID companyId) {
-        try {
-            Iterable<Result<Item>> results = minioClient.listObjects(ListObjectsArgs.builder().bucket(bucket).prefix(formattedFolder + companyId).build());
-            for (Result<Item> result : results) {
-                Item item = result.get();
-                if (item.objectName().startsWith(formattedFolder + companyId)) {
-                    return item.objectName();
-                }
-            }
+        Iterable<Result<Item>> results = minioClient.listObjects(
+                ListObjectsArgs.builder()
+                        .bucket(bucket)
+                        .prefix(formattedFolder + companyId)
+                        .build()
+        );
 
-            return null;
-        } catch (ErrorResponseException e) {
-            if ("NoSuchKey".equals(e.errorResponse().code())) {
-                return null;
-            } else {
-                throw new RuntimeException("Error occurred while checking object existence", e);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+        for (Result<Item> result : results) {
+            return result.get().objectName();
         }
+        return null;
     }
 
-    @SneakyThrows
-    private void putObject(String bucket, String objectName, UUID companyId, MultipartFile file, String extension) {
-        minioClient.putObject(PutObjectArgs.builder()
-                .bucket(bucket)
-                .object(objectName + companyId + "."  + extension)
-                .stream(file.getInputStream(), file.getSize(), -1)
-                .contentType(file.getContentType())
-                .build());
+    private void ensureBucketExistsAndPublic() throws Exception {
+        if (!minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build())) {
+            minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());
+        }
+
+        String policy = """
+                {
+                  "Version": "2012-10-17",
+                  "Statement": [{
+                    "Effect": "Allow",
+                    "Principal": "*",
+                    "Action": "s3:GetObject",
+                    "Resource": "arn:aws:s3:::%s/*"
+                  }]
+                }
+                """.formatted(bucket);
+
+        minioClient.setBucketPolicy(
+                SetBucketPolicyArgs.builder()
+                        .bucket(bucket)
+                        .config(policy)
+                        .build()
+        );
     }
 
     private String getExtension(MultipartFile file) {
-        if (file == null || file.isEmpty()) {
-            return null;
-        }
-
         return switch (Objects.requireNonNull(file.getContentType())) {
             case "image/png" -> "png";
             case "image/jpg", "image/jpeg" -> "jpg";
             case "image/webp" -> "webp";
-            default -> throw new IllegalArgumentException("Unsupported image type: " + file.getContentType());
+            default -> throw new IllegalArgumentException("Unsupported image type");
         };
     }
 }

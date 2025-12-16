@@ -57,7 +57,6 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
             userRepository.saveAndFlush(user);
 
             roleService.assignRoles(keycloakId, user.getUserType() == UserType.CANDIDATE ? UserType.CANDIDATE : UserType.RECRUITER);
-            log.info("User with email {} successfully created in Keycloak", userRegistrationDto.getEmail());
             return;
         }
 

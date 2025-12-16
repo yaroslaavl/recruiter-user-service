@@ -96,7 +96,6 @@ public class AuthServiceImpl implements AuthService {
             registrationService.registerUser(candidateRegistrationDto, candidate);
             Candidate registeredUser = candidateRepository.saveAndFlush(candidate);
 
-            log.info("Candidate with email: {} registered in the system", email);
             publisher.publishUserEvent(NotificationStore.userRegistered(registeredUser));
             return candidateMapper.toDto(candidate);
         } catch (Exception e) {
@@ -160,7 +159,6 @@ public class AuthServiceImpl implements AuthService {
             registrationService.registerUser(recruiterRegistrationDto, recruiterBuilder);
             recruiterRegistrationRequestService.create(company, savedRecruiter);
 
-            log.info("Recruiter with email: {} registered in the system", email);
             publisher.publishUserEvent(NotificationStore.userRegistered(savedRecruiter));
             return recruiterMapper.toDto(savedRecruiter);
         } catch (Exception e) {

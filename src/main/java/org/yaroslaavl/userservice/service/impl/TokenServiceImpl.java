@@ -139,7 +139,6 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private void handleUserLoginSuccess(User user) {
-        log.info("User {} logged in successfully", user.getEmail());
         redisTemplate.delete(MessageFormat.format(LOCKER_REDIS_KEY, user.getEmail()));
 
         user.setIsTemporaryBlocked(Boolean.FALSE);

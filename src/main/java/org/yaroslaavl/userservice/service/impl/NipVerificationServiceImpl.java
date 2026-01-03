@@ -72,7 +72,6 @@ public class NipVerificationServiceImpl implements NipVerificationService {
                 parametryWyszukiwania.setNip(nipParam);
 
                 String report = port.daneSzukajPodmioty(parametryWyszukiwania);
-                log.info("Report: {}", report);
 
                 if (report == null || report.trim().isEmpty()) {
                     throw new RuntimeException("GUS API returned an empty or null report");

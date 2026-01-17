@@ -29,7 +29,7 @@ public class MinioServiceImpl implements MinioService {
     @Value("${minio.bucket-name}")
     private String bucket;
 
-    @Value("${minio.url}")
+    @Value("${minio.internal-url}")
     private String minioUrl;
 
     @Value("${bucket.folder}")

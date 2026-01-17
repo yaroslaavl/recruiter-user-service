@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class CompanyUrlHelper {
 
-    @Value("${minio.url}")
+    @Value("${minio.public-url}")
     private String minioUrl;
 
     @Value("${minio.bucket-name}")

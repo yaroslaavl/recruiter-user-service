@@ -61,10 +61,9 @@ public class KeycloakRegistrationServiceImpl implements KeycloakRegistrationServ
         }
 
         String errorMessage = response.readEntity(String.class);
-        log.error("Failed to create user with email {} in Keycloak. Status: {}, Error: {}",
-                userRegistrationDto.getEmail(), response.getStatus(), errorMessage);
+        log.error("Failed to create user in Keycloak. Status: {}, Error: {}", response.getStatus(), errorMessage);
 
-        throw new KeyCloakException("Failed to create user with email " + userRegistrationDto.getEmail() + " in Keycloak. Status: {" + response.getStatus() + "}, Error: " + errorMessage);
+        throw new KeyCloakException("Failed to create user in Keycloak. Status: {" + response.getStatus() + "}, Error: " + errorMessage);
     }
 
     private UserRepresentation getUserRepresentation(UserRegistrationDto userRegistrationDto) {

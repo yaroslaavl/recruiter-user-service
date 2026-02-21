@@ -24,7 +24,26 @@ public interface RecruiterRegistrationRequestMapper {
     @Mapping(target = "reviewedBy", expression = "java(getReviewerFirstAndLastName(recruiterRegistrationRequest))")
     RecruiterRegistrationRequestResponseDto toDto(RecruiterRegistrationRequest recruiterRegistrationRequest);
 
-    default String getReviewerFirstAndLastName(RecruiterRegistrationRequest recruiterRegistrationRequest) {
-        return recruiterRegistrationRequest.getReviewedBy().getFirstName() + " " + recruiterRegistrationRequest.getReviewedBy().getLastName();
+    default String getReviewerFirstAndLastName(RecruiterRegistrationRequest request) {
+        if (request == null || request.getReviewedBy() == null) {
+            return "";
+        }
+
+        String firstName = request.getReviewedBy().getFirstName();
+        String lastName = request.getReviewedBy().getLastName();
+
+        if (firstName == null && lastName == null) {
+            return "";
+        }
+
+        if (firstName == null) {
+            return lastName;
+        }
+
+        if (lastName == null) {
+            return firstName;
+        }
+
+        return firstName + " " + lastName;
     }
 }
